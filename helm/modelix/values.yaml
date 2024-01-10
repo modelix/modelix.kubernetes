@@ -1,0 +1,65 @@
+
+nameOverride: ""
+fullnameOverride: ""
+
+imageTags:
+  db: ""
+  instancesManager: ""
+  model: "2.10.5"
+  oauth: ""
+  proxy: ""
+  keycloak: ""
+  wsClient: ""
+  wsManager: ""
+  wsJob: ""
+
+modelStorageSize: 3000Mi
+
+# Maximal size of request body in mebibyte for ingress and proxy.
+# Especially relevant for uploads in the workspace manger.
+maxBodySize: 200
+
+developmentMode: false
+
+keycloak:
+  adminPassword: "modelix"
+  realm: "modelix"
+  clientId: "modelix"
+  clientSecret: ""
+  loglevel: "warn"
+  debug: false
+
+workspaces:
+  enabled: true
+  uploadsStorageSize: 5000Mi
+  manager:
+    memory: 600Mi
+
+ingress:
+  installController: true
+  hostname: "localhost"
+  port: ""
+  certSecret: ""
+  tls:
+    crt: ""
+    key: ""
+
+certmanager:
+  # Setting this to true requires that appropriate cert-manager CRDs are
+  # installed before as described here:
+  # https://cert-manager.io/docs/installation/helm/#option-1-installing-crds-with-kubectl
+  enabled: false
+
+db:
+  useGCloud: false
+  user: "modelix"
+  password: "modelix"
+  db: "modelix"
+  storage: 3000Mi
+
+dockerProxy:
+  prefix: ""
+  secret: ""
+  secret64: ""
+
+serviceAccount: ""

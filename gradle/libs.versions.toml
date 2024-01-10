@@ -1,0 +1,11 @@
+[versions]
+modelixCore="2.10.5"
+keycloak="19.0.1"
+
+[libraries]
+keycloak-core = { group = "org.keycloak", name = "keycloak-core", version.ref = "keycloak" }
+keycloak-server-spi = { group = "org.keycloak", name = "keycloak-server-spi", version.ref = "keycloak" }
+keycloak-server-spi-private = { group = "org.keycloak", name = "keycloak-server-spi-private", version.ref = "keycloak" }
+
+[plugins]
+gitVersion = { id = "com.palantir.git-version", version = "3.0.0" }

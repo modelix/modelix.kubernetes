@@ -1,0 +1,17 @@
+imageTags:
+  db: ""
+  instancesManager: ""
+  proxy: ""
+  wsClient: ""
+  wsManager: ""
+  wsJob: ""
+  keycloak: ""
+ingress:
+  hostname: "localhost"
+ingress-nginx:
+  enabled: true
+keycloak:
+  loglevel: "warn"
+  debug: true
+workspaces:
+  enabled: true
