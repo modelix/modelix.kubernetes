@@ -3,6 +3,7 @@ plugins {
 }
 
 version = computeVersion()
+description = "Helm Chart to run MPS and Modelix components in the cloud with Kubernetes"
 
 fun computeVersion(): Any {
     val versionFile = file("helm-chart-version.txt")
