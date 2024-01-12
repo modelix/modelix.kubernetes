@@ -1,5 +1,4 @@
 [versions]
-modelixCore="2.10.5"
 keycloak="19.0.1"
 
 [libraries]
