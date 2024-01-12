@@ -3,6 +3,8 @@
 set -e
 set -x
 
+cd "$(dirname "$0")"
+
 HELM_CHART_VERSION="$(cat ../helm-chart-version.txt)"
 
 if [ "${CI}" = "true" ]; then

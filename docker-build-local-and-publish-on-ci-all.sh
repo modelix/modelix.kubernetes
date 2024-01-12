@@ -3,15 +3,6 @@
 set -e
 set -x
 
-(
- cd db
- ./docker-build-local-and-publish-on-ci.sh
-)
-(
- cd keycloak-extensions
- ./docker-build-local-and-publish-on-ci.sh
-)
-(
- cd proxy
- ./docker-build-local-and-publish-on-ci.sh
-)
+./db/docker-build-local-and-publish-on-ci.sh
+./keycloak-extensions/docker-build-local-and-publish-on-ci.sh
+./proxy/docker-build-local-and-publish-on-ci.sh
