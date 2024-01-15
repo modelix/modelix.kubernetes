@@ -10,6 +10,11 @@ You can deploy the [published Helm chart](https://artifacts.itemis.cloud/reposit
 helm install --repo https://artifacts.itemis.cloud/repository/helm-modelix/ dev modelix
 ```
 
+> [!CAUTION]  
+> If you already have the chart installed and want to upgrade its version
+> use helm `helm upgrade` and **not** `helm uninstall`.
+> In the default setup `helm uninstall` would remove the database and uploaded files.
+
 > [!TIP]
 > Locally you can run a Kubernetes Cluster (among other options) with Docker Desktop.
 > 
@@ -78,6 +83,13 @@ This Helm chart is tightly coupled and has to be developed in together with [Mod
    ```shell
    ./helm/install.sh
    ```
+   
+   > [!NOTE]  
+   > If you already have the chart installed, you can run: 
+   > ```shell
+   > ./helm/upgrade.sh
+   > ```
+   > This will only update all images while keeping all data.
 
 ## Additional Configuration
 
