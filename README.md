@@ -98,3 +98,11 @@ and the nodes don't keep running because some other small pod was scheduled to t
 
 An MPS instances with a lot of languages and plugins can require ~8 GB of memory.
 16 GB of memory for a node is a reasonable size.
+
+## Publishing
+
+Commits published to `main` automatically trigger a new release.
+
+Update the [versions.properties](versions.properties) to update the versions of:
+* Modelix Model Server
+* Modelix Workspace components
