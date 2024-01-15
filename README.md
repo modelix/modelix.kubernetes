@@ -55,6 +55,30 @@ This Helm chart is tightly coupled and has to be developed in together with [Mod
    ./helm/install.sh
    ```
 
+### Making changes to [Modelix Workspace components](https://github.com/modelix/modelix.workspaces)
+
+1. Follow the [instructions in Modelix Workspace components](https://github.com/modelix/modelix.workspaces?tab=readme-ov-file#development) to build OCI images with local changes.
+
+2. Update the `modelixWorkspacesVersion` in [versions.properties](versions.properties) to the version of the locally built images.  
+   You can find out the version in the labels of the newly built images or in the `workspaces-version.txt` in your locally checked out [Modelix Workspace components](https://github.com/modelix/modelix.workspaces)
+   where you build the images in.
+   The versions.properties would the look like:
+   ```properties
+    # Modelix core version.
+    modelixCoreVersion=2.10.5
+    # Modelix Workspaces versions
+    # 0.0.2-9-gb8651c9 is an example for the versions of Workspace components you want to run the Helm chart with.
+    modelixWorkspacesVersion=0.0.2-9-gb8651c9
+   ```
+3. Update the versions in the local helm chart with:
+   ```shell
+   ./helm/update-versions.sh
+   ```
+4. Install the Helm chart with the changed images:
+   ```shell
+   ./helm/install.sh
+   ```
+
 ## Additional Configuration
 
 ### Admin password
@@ -74,27 +98,3 @@ and the nodes don't keep running because some other small pod was scheduled to t
 
 An MPS instances with a lot of languages and plugins can require ~8 GB of memory.
 16 GB of memory for a node is a reasonable size.
-   
-### Making changes to [Modelix Workspace components](https://github.com/modelix/modelix.workspaces)
-
-1. Follow the instructions in [Modelix Workspace components](https://github.com/modelix/modelix.workspaces) to build OCI images with local changes. TODO Olekz link sub page
-
-2. Update the `modelixWorkspacesVersion` in [versions.properties](versions.properties) to the version of the locally built images.  
-  You can find out the version in the labels of the newly built images or in the `workspaces-version.txt` in your locally checked out [Modelix Workspace components](https://github.com/modelix/modelix.workspaces)
-  where you build the images in.
-   The versions.properties would the look like:
-   ```properties
-    # Modelix core version.
-    modelixCoreVersion=2.10.5
-    # Modelix Workspaces versions
-    # 0.0.2-9-gb8651c9 is an example for the versions of Workspace components you want to run the Helm chart with.
-    modelixWorkspacesVersion=0.0.2-9-gb8651c9
-   ```
-3. Update the versions in the local helm chart with:
-   ```shell
-   ./helm/update-versions.sh
-   ```
-4. Install the Helm chart with the changed images:
-   ```shell
-   ./helm/install.sh
-   ```
