@@ -26,7 +26,7 @@ spec:
     spec:
       serviceAccountName: "{{ include "modelix.serviceAccountName" . }}"
       containers:
-      - image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-instances-manager:{{ .Values.imageTags.instancesManager | default .Chart.AppVersion }}"
+      - image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-instances-manager:{{ .Values.imageTags.instancesManager | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
         name: instances-manager
         env:

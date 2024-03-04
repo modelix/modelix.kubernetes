@@ -30,7 +30,7 @@ spec:
           effect: "NoExecute"
       containers:
       - name: workspace-client
-        image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-client:{{ .Values.imageTags.wsClient | default .Chart.AppVersion }}"
+        image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-client:{{ .Values.imageTags.wsClient | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
         env:
         - name: "modelix_executionMode"
@@ -40,28 +40,37 @@ spec:
         - name: MODEL_URI
           value: "http://{{ include "modelix.fullname" . }}-model:28101/"
         ports:
-        - containerPort: 8887
-        resources: 
+        - name: "projector"
+          containerPort: 8887
+        - name: "jvmdebug"
+          containerPort: 5071
+        - name: "yourkit"
+          containerPort: 10001
+        - name: "diff"
+          containerPort: 33334
+        - name: "generator"
+          containerPort: 33335
+        resources:
           requests:
             memory: "4.0Gi" # is replaced with the value in the workspace configuration
             cpu: 500m
           limits:
             memory: "4.0Gi" # is replaced with the value in the workspace configuration
             cpu: "1.5"
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 33333
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 33333
-          initialDelaySeconds: 120
-          periodSeconds: 20
-          timeoutSeconds: 10
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: 8887
+#          initialDelaySeconds: 10
+#          periodSeconds: 5
+#          timeoutSeconds: 3
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: 8887
+#          initialDelaySeconds: 120
+#          periodSeconds: 20
+#          timeoutSeconds: 10
       restartPolicy: Always
       {{- include "modelix.pullSecret" . | nindent 6 }}
 {{- end -}}

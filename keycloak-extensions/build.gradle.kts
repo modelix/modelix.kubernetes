@@ -12,3 +12,9 @@ dependencies {
 tasks.withType<Jar> {
     archiveFileName.set("keycloak-extensions.jar")
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
