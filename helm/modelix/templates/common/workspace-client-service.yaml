@@ -15,9 +15,18 @@ spec:
   - name: "modelix-ui"
     port: 33333
     targetPort: 33333
+  - name: "diff"
+    port: 33334
+    targetPort: 33334
+  - name: "generator"
+    port: 33335
+    targetPort: 33335
   - name: "debug"
     port: 5071
     targetPort: 5071
+  - name: "yourkit"
+    port: 10001
+    targetPort: 10001
   selector:
     component: workspace-client
     {{- include "modelix.selectorLabels" . | nindent 4 }}

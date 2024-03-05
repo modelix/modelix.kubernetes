@@ -28,7 +28,7 @@ spec:
             - name: jdbc_url
               value: jdbc:postgresql://{{ include "modelix.fullname" . }}-db:5432/
             {{- include "modelix.keycloakEnv" . | nindent 12 }}
-          image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-model:{{ .Values.imageTags.model | default .Chart.AppVersion }}"
+          image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-model:{{ .Values.imageTags.model | default .Values.versions.modelix.core }}"
           imagePullPolicy: IfNotPresent
           name: model
           ports:
