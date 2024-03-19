@@ -40,6 +40,12 @@ workspaces:
   uploadsStorageSize: 5000Mi
   manager:
     memory: 600Mi
+  client:
+    # Port as number which should be exposed from MPS.
+    # Empty string if no custom service should be exposed.
+    # This can be used to make service from custom MPS Plugins reachable from the workspaces.
+    # This feature is experimental and might change in the future.
+    experimentalCustomServicePort: ""
 
 ingress:
   installController: true

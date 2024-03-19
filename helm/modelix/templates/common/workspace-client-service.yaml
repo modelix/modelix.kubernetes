@@ -21,6 +21,11 @@ spec:
   - name: "generator"
     port: 33335
     targetPort: 33335
+  {{ if .Values.workspaces.client.experimentalCustomServicePort }}
+  - name: "custom-service"
+    port: 33336
+    targetPort: "custom-service"
+  {{ end }}
   - name: "debug"
     port: 5071
     targetPort: 5071
