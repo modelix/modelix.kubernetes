@@ -50,6 +50,10 @@ spec:
           containerPort: 33334
         - name: "generator"
           containerPort: 33335
+        {{ if .Values.workspaces.client.experimentalCustomServicePort }}
+        - name: "custom-service"
+          containerPort: {{ .Values.workspaces.client.experimentalCustomServicePort }}
+        {{ end }}
         resources:
           requests:
             memory: "4.0Gi" # is replaced with the value in the workspace configuration
