@@ -11,19 +11,19 @@ spec:
   ports:
   - name: "projector"
     port: 8887
-    targetPort: 8887
+    targetPort: "projector"
   - name: "diff"
     port: 33334
-    targetPort: 33334
+    targetPort: "diff"
   - name: "generator"
     port: 33335
-    targetPort: 33335
-  - name: "debug"
+    targetPort: "generator"
+  - name: "jvmdebug"
     port: 5071
-    targetPort: 5071
+    targetPort: "jvmdebug"
   - name: "yourkit"
     port: 10001
-    targetPort: 10001
+    targetPort: "yourkit"
   selector:
     component: workspace-client
     {{- include "modelix.selectorLabels" . | nindent 4 }}
