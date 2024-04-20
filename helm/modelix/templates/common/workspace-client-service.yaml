@@ -24,6 +24,11 @@ spec:
   - name: "yourkit"
     port: 10001
     targetPort: "yourkit"
+  {{- range $index, $port := .Values.workspaces.client.customExposedPorts }}
+  - name: "custom-port-{{ $index }}"
+    port: {{ $port }}
+    targetPort: "custom-port-{{ $index }}"
+  {{- end }}
   selector:
     component: workspace-client
     {{- include "modelix.selectorLabels" . | nindent 4 }}

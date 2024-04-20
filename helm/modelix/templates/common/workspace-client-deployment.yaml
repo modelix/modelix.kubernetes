@@ -50,6 +50,10 @@ spec:
           containerPort: 33334
         - name: "generator"
           containerPort: 33335
+        {{- range $index, $port := .Values.workspaces.client.customExposedPorts }}
+        - name: "custom-port-{{ $index }}"
+          containerPort: {{ $port }}
+        {{- end }}
         resources:
           requests:
             memory: "4.0Gi" # is replaced with the value in the workspace configuration
