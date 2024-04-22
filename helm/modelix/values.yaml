@@ -22,7 +22,7 @@ imageTags:
 modelStorageSize: 3000Mi
 
 # Maximal size of request body in mebibyte for ingress and proxy.
-# Especially relevant for uploads in the workspace manger.
+# Especially relevant for uploads in the workspace manager.
 maxBodySize: 200
 
 developmentMode: false
@@ -40,6 +40,11 @@ workspaces:
   uploadsStorageSize: 5000Mi
   manager:
     memory: 600Mi
+  client:
+    # Ports as numbers which should be exposed from MPS.
+    #
+    # A use case is exposing custom servers running inside MPS.
+    customExposedPorts: []
 
 ingress:
   installController: true
