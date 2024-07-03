@@ -61,20 +61,33 @@ spec:
           limits:
             memory: "4.0Gi" # is replaced with the value in the workspace configuration
             cpu: "1.5"
-#        readinessProbe:
-#          httpGet:
-#            path: /
-#            port: 8887
-#          initialDelaySeconds: 10
-#          periodSeconds: 5
-#          timeoutSeconds: 3
-#        livenessProbe:
-#          httpGet:
-#            path: /
-#            port: 8887
-#          initialDelaySeconds: 120
-#          periodSeconds: 20
-#          timeoutSeconds: 10
+        # 8887 is the port used to access the MPS UI.
+        # http://localhost:8887/mainWindows can be used to list opened windows.
+        # See https://github.com/JetBrains/projector-client/blob/0f1e08a68f01c417a7ce8a58afe77d63603e22db/projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/websocket/HttpWsServer.kt#L68
+        # The response is single line of JSON.
+        # Example responses values are:
+        # * `[]`, when no windows are opened yet
+        # * `[{"title":"splash","pngBase64Icon":null}]`, when the splash screen is loading
+        # * `[{"title":"<projectName>","pngBase64Icon":"iVB<...>YII="}]`, when one project is opened
+        #
+        # With the different probes, we make sure to only redirect the user to the UI when MPS started.
+        # Use `wget` because `curl` does not exist in container.
+        startupProbe:
+          exec:
+            command: ["/bin/sh", "-c", "wget -qO- http://localhost:8887/mainWindows | grep -vqF '[]'"]
+          # Give MPS and projector 2 minutes (12 * 10 seconds) to startup.
+          failureThreshold: 12
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "wget -qO- http://localhost:8887/mainWindows | grep -vqF '[]'"]
+          periodSeconds: 20
+          timeoutSeconds: 10
+        readinessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "wget -qO- http://localhost:8887/mainWindows | grep -vqF '[]'"]
+          periodSeconds: 5
+          timeoutSeconds: 3
       restartPolicy: Always
       {{- include "modelix.pullSecret" . | nindent 6 }}
 {{- end -}}
