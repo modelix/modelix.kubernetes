@@ -60,6 +60,14 @@ This Helm chart is tightly coupled and has to be developed in together with [Mod
    ./helm/install.sh
    ```
 
+   > [!NOTE]  
+   > If you already have the chart installed, you can run:
+   > ```shell
+   > ./helm/upgrade.sh
+   > ```
+   > This will only update all images while keeping all data.
+
+
 ### Making changes to [Modelix Workspace components](https://github.com/modelix/modelix.workspaces)
 
 1. Follow the [instructions in Modelix Workspace components](https://github.com/modelix/modelix.workspaces?tab=readme-ov-file#development) to build OCI images with local changes.
