@@ -72,7 +72,7 @@ spec:
           - mountPath: "/workspace-manager/modelix-workspaces/uploads"
             name: "{{ include "modelix.fullname" . }}-workspace-uploads"
           - name: "{{ include "modelix.fullname" . }}-workspace-secret"
-            mountPath: /secrets/workspacesecret/workspace-credentials-key.txt
+            mountPath: /secrets/workspacesecret
             readOnly: true
       restartPolicy: Always
       volumes:
@@ -82,5 +82,8 @@ spec:
         - name: "{{ include "modelix.fullname" . }}-workspace-secret"
           secret:
             secretName: "{{ include "modelix.fullname" . }}-workspace-secret"
+            items:
+              - key: workspace-secret
+                path: workspace-credentials-key.txt
       {{- include "modelix.pullSecret" . | nindent 6 }}
 {{- end -}}
