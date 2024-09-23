@@ -39,6 +39,14 @@ spec:
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
             value: "{{ .Values.maxBodySize }}"
+            # TODO MODELIX-597 Check, which one are really needed.
+            # Check if, additional are needed.
+          - name: "WORKSPACE_VERSION"
+            value: "{{ .Values.versions.modelix.workspaces }}"
+          - name: "DOCKER_PROXY_PREFIX"
+            value: "{{ .Values.dockerProxy.prefix }}"
+          - name: "FULLY_QUALIFIED_MODELIX_APP_NAME"
+            value: "{{ include "modelix.fullname" . }}"
           {{- include "modelix.keycloakEnv" . | nindent 10 }}
         image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-manager:{{ .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
