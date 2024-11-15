@@ -1,0 +1,15 @@
+{{- if .Values.workspaces.enabled  -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    component: workspace-uploads
+    {{- include "modelix.labels" . | nindent 4 }}
+  name: "{{ include "modelix.fullname" . }}-workspace-config"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+{{- end -}}

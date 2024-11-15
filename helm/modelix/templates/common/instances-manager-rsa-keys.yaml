@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
+type: Opaque
+data:
+  {{ $cert := genSelfSignedCert "instances-manager" nil nil 36524 -}}
+  public: {{ $cert.Cert | b64enc }}
+  private: {{ $cert.Key | b64enc }}

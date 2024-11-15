@@ -4,10 +4,10 @@ fullnameOverride: ""
 
 versions:
   modelix:
-    workspaces: "0.3.2"
-    core: "4.11.5"
-    kubernetes: "0.1.2-dirty"
-    vncBaseImage: "0.6.0"
+    workspaces: "0.4.4-pr194-655a1216"
+    core: "10.1.0-pr1190-c6ab4b78"
+    kubernetes: "0.3.1"
+    vncBaseImage: "0.7.0"
 
 imageTags:
   db: ""
@@ -75,3 +75,6 @@ dockerProxy:
   secret64: ""
 
 serviceAccount: ""
+
+authorization:
+  enabled: true
