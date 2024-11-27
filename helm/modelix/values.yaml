@@ -4,10 +4,10 @@ fullnameOverride: ""
 
 versions:
   modelix:
-    workspaces: "0.4.4-pr194-1783e3b0"
-    core: "10.1.0-pr1190-c6ab4b78"
+    workspaces: "0.4.4-pr194-299426c6"
+    core: "10.1.0-pr1190-187b03d6"
     kubernetes: "0.3.1"
-    vncBaseImage: "0.7.0"
+    vncBaseImage: "0.8.0"
 
 imageTags:
   db: ""

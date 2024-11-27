@@ -40,7 +40,7 @@ spec:
         - name: MODEL_URI
           value: "http://{{ include "modelix.fullname" . }}-model:28101/"
         - name: PRE_STARTUP_SCRIPT_URL
-          value: "http://{{ include "modelix.fullname" . }}-workspace-manager:28104/client/pre-startup.sh"
+          value: "http://{{ include "modelix.fullname" . }}-workspace-manager:28104/static/pre-startup.sh"
         ports:
         - name: "vnc"
           containerPort: 5800

@@ -32,9 +32,9 @@ spec:
           - name: "KUBERNETES_NAMESPACE"
             value: {{ .Release.Namespace }}
           - name: "WORKSPACE_JOB_IMAGE_NAME"
-            value: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-job"
+            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
           - name: "WORKSPACE_JOB_IMAGE_VERSION"
-            value: "{{ .Values.imageTags.wsJob | default .Values.versions.modelix.workspaces | default .Chart.AppVersion }}"
+            value: "{{ .Values.versions.modelix.vncBaseImage }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
