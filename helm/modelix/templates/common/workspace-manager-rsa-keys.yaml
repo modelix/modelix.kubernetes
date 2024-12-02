@@ -4,6 +4,8 @@ metadata:
   name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
 type: Opaque
 data:
-  {{ $cert := genSelfSignedCert "workspace-manager" nil nil 36524 -}}
-  public: {{ $cert.Cert | b64enc }}
-  private: {{ $cert.Key | b64enc }}
+  {{- $existingSecret := (lookup "v1" "Secret" .Release.Namespace (printf "%s%s" ( include "modelix.fullname" . ) "-workspace-manager-rsa-keys")) | default dict -}}
+  {{- $existingData := (get $existingSecret "data") | default dict -}}
+  {{- $newCert := genSelfSignedCert "workspace-manager" nil nil 36524 }}
+  public: {{ $existingData.public | default ($newCert.Cert | b64enc) }}
+  private: {{ $existingData.private | default ($newCert.Key | b64enc) }}
