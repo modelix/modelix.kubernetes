@@ -7,7 +7,7 @@ versions:
     workspaces: "0.4.4-pr194-299426c6"
     core: "10.1.0-pr1190-187b03d6"
     kubernetes: "0.3.1"
-    vncBaseImage: "0.8.0"
+    vncBaseImage: "0.8.1"
 
 imageTags:
   db: ""
