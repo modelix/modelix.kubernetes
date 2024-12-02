@@ -4,7 +4,7 @@ fullnameOverride: ""
 
 versions:
   modelix:
-    workspaces: "0.4.4-pr194-299426c6"
+    workspaces: "0.4.4-pr194-12d5b4e3"
     core: "10.1.0-pr1190-187b03d6"
     kubernetes: "0.3.1"
     vncBaseImage: "0.8.1"
