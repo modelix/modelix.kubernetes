@@ -7,12 +7,13 @@ versions:
     workspaces: "0.4.4-pr194-12d5b4e3"
     core: "10.1.0-pr1190-187b03d6"
     kubernetes: "0.3.1"
-    vncBaseImage: "0.8.1"
+    vncBaseImage: "0.8.2"
 
 imageTags:
   db: ""
   instancesManager: ""
   model: ""
+  registry: ""
   oauth: ""
   proxy: ""
   keycloak: ""

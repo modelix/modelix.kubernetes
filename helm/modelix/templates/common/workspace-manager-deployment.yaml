@@ -32,21 +32,24 @@ spec:
           - name: "KUBERNETES_NAMESPACE"
             value: {{ .Release.Namespace }}
           - name: "WORKSPACE_JOB_IMAGE_NAME"
-            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
+            value: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-job"
           - name: "WORKSPACE_JOB_IMAGE_VERSION"
-            value: "{{ .Values.versions.modelix.vncBaseImage }}"
+            value: "{{ .Values.imageTags.wsJob | default .Values.versions.modelix.workspaces | default .Chart.AppVersion }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
             value: "{{ .Values.maxBodySize }}"
           - name: "MODELIX_JWK_FILE"
             value: /secrets/jwk/
+          - name: MPS_BASEIMAGE_VERSION
+            value: {{ .Values.versions.modelix.vncBaseImage }}
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
         image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-manager:{{ .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
         name: workspace-manager
         ports:
         - containerPort: 28104
+          name: "http"
         - containerPort: 5071
           name: "jvm-debug"
         resources: 

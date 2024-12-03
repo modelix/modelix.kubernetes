@@ -31,7 +31,7 @@ spec:
       containers:
       - name: workspace-client
         image: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage:{{ .Values.versions.modelix.vncBaseImage }}-mps2024.1"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: "modelix_executionMode"
           value: "PROJECTOR"
@@ -39,8 +39,6 @@ spec:
           value: "http://{{ include "modelix.fullname" . }}-workspace-manager:28104/"
         - name: MODEL_URI
           value: "http://{{ include "modelix.fullname" . }}-model:28101/"
-        - name: PRE_STARTUP_SCRIPT_URL
-          value: "http://{{ include "modelix.fullname" . }}-workspace-manager:28104/static/pre-startup.sh"
         ports:
         - name: "vnc"
           containerPort: 5800
