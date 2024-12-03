@@ -7,7 +7,7 @@ metadata:
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-workspace-client"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: "vnc"
     port: 5800

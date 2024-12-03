@@ -6,7 +6,7 @@ metadata:
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-model"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: "28101"
     port: 28101
