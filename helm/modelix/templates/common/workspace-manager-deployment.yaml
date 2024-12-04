@@ -47,6 +47,8 @@ spec:
             value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
           - name: DOCKER_REGISTRY_SERVICE_NAME
             value: "{{ include "modelix.fullname" . }}-docker-registry"
+          - name: SKIP_TLS_VERIFY_PULL
+            value: "{{ .Values.dockerProxy.skipTlsVerifyPull }}"
           {{- if .Values.dockerProxy.secret64 }}
           - name: DOCKER_CONFIG_SECRET_NAME
             value: "{{ include "modelix.fullname" . }}-docker-secret"
