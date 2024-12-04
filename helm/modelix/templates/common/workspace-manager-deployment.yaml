@@ -43,6 +43,14 @@ spec:
             value: /secrets/jwk/
           - name: MPS_BASEIMAGE_VERSION
             value: {{ .Values.versions.modelix.vncBaseImage }}
+          - name: MPS_BASEIMAGE_NAME
+            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
+          - name: DOCKER_REGISTRY_SERVICE_NAME
+            value: "{{ include "modelix.fullname" . }}-docker-registry"
+          {{- if .Values.dockerProxy.secret64 }}
+          - name: DOCKER_CONFIG_SECRET_NAME
+            value: "{{ include "modelix.fullname" . }}-docker-secret"
+          {{- end }}
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
         image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-manager:{{ .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
