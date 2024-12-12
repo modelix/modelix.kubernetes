@@ -30,7 +30,7 @@ spec:
             - name: "MODELIX_JWK_FILE"
               value: /secrets/jwk/
             {{- include "modelix.authorizationConfig" . | nindent 12 }}
-          image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-model:{{ .Values.imageTags.model | default .Values.versions.modelix.core }}"
+          image: "{{ .Values.dockerProxy.prefix }}modelix/model-server:{{ .Values.imageTags.model | default .Values.versions.modelix.core }}"
           imagePullPolicy: IfNotPresent
           name: model
           ports:
