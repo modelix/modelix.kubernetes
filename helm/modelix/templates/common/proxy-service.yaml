@@ -6,7 +6,7 @@ metadata:
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-proxy"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: "80"
     port: 80

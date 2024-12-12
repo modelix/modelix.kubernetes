@@ -39,12 +39,25 @@ spec:
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
             value: "{{ .Values.maxBodySize }}"
-          {{- include "modelix.keycloakEnv" . | nindent 10 }}
+          - name: "MODELIX_JWK_FILE"
+            value: /secrets/jwk/
+          - name: MPS_BASEIMAGE_VERSION
+            value: {{ .Values.versions.modelix.vncBaseImage }}
+          - name: MPS_BASEIMAGE_NAME
+            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
+          - name: DOCKER_REGISTRY_SERVICE_NAME
+            value: "{{ include "modelix.fullname" . }}-docker-registry"
+          {{- if .Values.dockerProxy.secret64 }}
+          - name: DOCKER_CONFIG_SECRET_NAME
+            value: "{{ include "modelix.fullname" . }}-docker-secret"
+          {{- end }}
+          {{- include "modelix.authorizationConfig" . | nindent 10 }}
         image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-manager:{{ .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"
         imagePullPolicy: IfNotPresent
         name: workspace-manager
         ports:
         - containerPort: 28104
+          name: "http"
         - containerPort: 5071
           name: "jvm-debug"
         resources: 
@@ -71,19 +84,42 @@ spec:
         volumeMounts:
           - mountPath: "/workspace-manager/modelix-workspaces/uploads"
             name: "{{ include "modelix.fullname" . }}-workspace-uploads"
+          - mountPath: "/workspace-manager/config"
+            name: "{{ include "modelix.fullname" . }}-workspace-config"
           - name: "{{ include "modelix.fullname" . }}-workspace-secret"
             mountPath: /secrets/workspacesecret
+            readOnly: true
+          - name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
+            mountPath: /secrets/jwk/wsmanager
+            readOnly: true
+          - name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
+            mountPath: /secrets/jwk/instancesmanager
             readOnly: true
       restartPolicy: Always
       volumes:
         - name: "{{ include "modelix.fullname" . }}-workspace-uploads"
           persistentVolumeClaim:
             claimName: "{{ include "modelix.fullname" . }}-workspace-uploads"
+        - name: "{{ include "modelix.fullname" . }}-workspace-config"
+          persistentVolumeClaim:
+            claimName: "{{ include "modelix.fullname" . }}-workspace-config"
         - name: "{{ include "modelix.fullname" . }}-workspace-secret"
           secret:
             secretName: "{{ include "modelix.fullname" . }}-workspace-secret"
             items:
               - key: workspace-secret
                 path: workspace-credentials-key.txt
+        - name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
+          secret:
+            secretName: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
+            items:
+              - key: private
+                path: private.pem
+        - name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
+          secret:
+            secretName: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
+            items:
+              - key: public
+                path: instances-manager-public.pem
       {{- include "modelix.pullSecret" . | nindent 6 }}
 {{- end -}}

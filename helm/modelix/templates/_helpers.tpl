@@ -81,17 +81,10 @@ https://{{ .Values.ingress.hostname }}{{ if .Values.ingress.port }}:{{ .Values.i
 http://{{ include "modelix.fullname" . }}-keycloak:8080/
 {{- end }}
 
-{{- define "modelix.keycloakEnv" -}}
-- name: KEYCLOAK_CLIENT_SECRET
-  valueFrom:
-    secretKeyRef:
-      key: keycloak-client-secret
-      name: "{{ include "modelix.fullname" . }}-keycloak-client-secret"
-- name: KEYCLOAK_CLIENT_ID
-  value: "{{ .Values.keycloak.clientId }}"
-- name: KEYCLOAK_REALM
-  value: "{{ .Values.keycloak.realm }}"
-- name: KEYCLOAK_BASE_URL
-  value: "{{ include "modelix.internalKeycloakUrl" . }}"
+{{- define "modelix.authorizationConfig" -}}
+- name: MODELIX_JWK_URI_KEYCLOAK
+  value: "{{ include "modelix.internalKeycloakUrl" . }}realms/{{ .Values.keycloak.realm }}/protocol/openid-connect/certs"
+- name: MODELIX_PERMISSION_CHECKS_ENABLED
+  value: "{{ .Values.authorization.enabled }}"
 {{- end }}
 

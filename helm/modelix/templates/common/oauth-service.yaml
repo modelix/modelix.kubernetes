@@ -6,7 +6,7 @@ metadata:
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-oauth"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 4180
       name: "http"

@@ -7,9 +7,9 @@ metadata:
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-workspace-manager"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-  - name: "28104"
+  - name: "http"
     port: 28104
     targetPort: 28104
   - name: "debug"

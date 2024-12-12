@@ -18,4 +18,4 @@ spec:
   selector:
     component: keycloak
     {{- include "modelix.selectorLabels" . | nindent 4 }}
-  type: NodePort
+  type: ClusterIP
