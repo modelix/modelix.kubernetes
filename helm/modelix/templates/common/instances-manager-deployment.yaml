@@ -46,8 +46,8 @@ spec:
             value: http://{{ include "modelix.fullname" . }}-workspace-manager:28104/
           - name: WORKSPACE_DOCKER_REGISTRY
             value: localhost:5000
-          - name: DOCKER_REGISTRY_SERVICE_NAME
-            value: "{{ include "modelix.fullname" . }}-docker-registry"
+          - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
+            value: "localhost:{{ .Values.internalDockerRegistry.nodePort }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
         ports:
         - containerPort: 33332
