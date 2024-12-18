@@ -74,5 +74,6 @@ spec:
           periodSeconds: 20
           timeoutSeconds: 10
       restartPolicy: Always
-      {{- include "modelix.pullSecret" . | nindent 6 }}
+      imagePullSecrets:
+        - name: "{{ include "modelix.fullname" . }}-docker-registry-secret"
 {{- end -}}

@@ -76,6 +76,16 @@ dockerProxy:
   secret64: ""
   caCertificate: ""
 
+internalDockerRegistry:
+  # The internal docker registry does not use HTTPS.
+  # Kubernetes only allows pulling images from such insecure repositories when they run on localhost.
+  # Therefore, the internal docker registry is exposed through NodePort on each cluster node.
+  # The node port on which it is exposed needs
+  # to be known in advance because we need to specify the address for authentication.
+  # The node port is configurable to allow
+  # changing it in deployments where it conflicts with other statically assigned node ports.
+  nodePort: 30033
+
 serviceAccount: ""
 
 authorization:
