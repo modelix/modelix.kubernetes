@@ -40,8 +40,8 @@ spec:
             value: "{{ include "modelix.fullname" . }}-wsclt-"
           - name: WORKSPACE_CLIENT_IMAGE
             value: "modelix/modelix-workspace-client:{{ .Values.imageTags.wsClient | default .Chart.AppVersion }}"
-          - name: "MODELIX_JWK_FILE"
-            value: /secrets/jwk/
+          - name: "MODELIX_JWK_FILE_INSTANCES_MANAGER"
+            value: /secrets/jwk/instancesmanager/private.pem
           - name: MODELIX_WORKSPACE_SERVER
             value: http://{{ include "modelix.fullname" . }}-workspace-manager:28104/
           - name: WORKSPACE_DOCKER_REGISTRY
@@ -75,7 +75,7 @@ spec:
           timeoutSeconds: 10
         volumeMounts:
           - name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
-            mountPath: /secrets/jwk/wsmanager
+            mountPath: /secrets/jwk/instancesmanager
             readOnly: true
       restartPolicy: Always
       volumes:

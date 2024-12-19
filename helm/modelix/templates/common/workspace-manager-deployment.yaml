@@ -39,8 +39,10 @@ spec:
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
             value: "{{ .Values.maxBodySize }}"
-          - name: "MODELIX_JWK_FILE"
-            value: /secrets/jwk/
+          - name: "MODELIX_JWK_FILE_WORKSPACE_MANAGER"
+            value: /secrets/jwk/wsmanager/private.pem
+          - name: "MODELIX_JWK_FILE_INSTANCES_MANAGER"
+            value: /secrets/jwk/instancesmanager/instances-manager-public.pem
           - name: MPS_BASEIMAGE_VERSION
             value: {{ .Values.versions.modelix.vncBaseImage }}
           - name: MPS_BASEIMAGE_NAME

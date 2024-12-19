@@ -27,8 +27,10 @@ spec:
         - env:
             - name: jdbc_url
               value: jdbc:postgresql://{{ include "modelix.fullname" . }}-db:5432/
-            - name: "MODELIX_JWK_FILE"
-              value: /secrets/jwk/
+            - name: "MODELIX_JWK_FILE_WORKSPACE_MANAGER"
+              value: /secrets/jwk/wsmanager/workspace-manager-public.pem
+            - name: "MODELIX_JWK_FILE_INSTANCES_MANAGER"
+              value: /secrets/jwk/instancesmanager/instances-manager-public.pem
             {{- include "modelix.authorizationConfig" . | nindent 12 }}
           image: "{{ .Values.dockerProxy.prefix }}modelix/model-server:{{ .Values.imageTags.model | default .Values.versions.modelix.core }}"
           imagePullPolicy: IfNotPresent
