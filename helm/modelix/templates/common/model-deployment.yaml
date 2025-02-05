@@ -64,9 +64,6 @@ spec:
             - name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
               mountPath: /secrets/jwk/wsmanager
               readOnly: true
-            - name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
-              mountPath: /secrets/jwk/instancesmanager
-              readOnly: true
       restartPolicy: Always
       volumes:
         - name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
@@ -75,10 +72,4 @@ spec:
             items:
               - key: public
                 path: workspace-manager-public.pem
-        - name: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
-          secret:
-            secretName: "{{ include "modelix.fullname" . }}-instances-manager-rsa-keys"
-            items:
-              - key: public
-                path: instances-manager-public.pem
       {{- include "modelix.pullSecret" . | nindent 6 }}

@@ -8,15 +8,11 @@ handle_path /workspace-manager/* {
     reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28104
 }
 
-handle_path /instances-manager/* {
-    reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}instances-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28106
-}
-
 handle_path /keycloak/* {
     reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}keycloak.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 }
 
-reverse_proxy /workspace-* {$KUBERNETES_INSTANCE_PREFIX}instances-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:33332
+reverse_proxy /workspace-* {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:33332
 
 reverse_proxy /resource/* {$KUBERNETES_INSTANCE_PREFIX}keycloak.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 reverse_proxy /admin/* {$KUBERNETES_INSTANCE_PREFIX}keycloak.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
