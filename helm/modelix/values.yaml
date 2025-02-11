@@ -4,7 +4,7 @@ fullnameOverride: ""
 
 versions:
   modelix:
-    workspaces: "0.11.0"
+    workspaces: "0.12.0"
     core: "11.3.0"
     kubernetes: ""
     vncBaseImage: "0.9.4"
@@ -90,3 +90,5 @@ serviceAccount: ""
 
 authorization:
   enabled: true
+
+httpProxy: ""

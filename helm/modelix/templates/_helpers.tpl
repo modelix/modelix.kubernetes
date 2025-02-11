@@ -88,3 +88,9 @@ http://{{ include "modelix.fullname" . }}-keycloak:8080/
   value: "{{ .Values.authorization.enabled }}"
 {{- end }}
 
+{{- define "modelix.commonVariables" -}}
+{{- if .Values.httpProxy }}
+- name: MODELIX_HTTP_PROXY
+  value: "{{ .Values.httpProxy }}"
+{{- end }}
+{{- end }}
