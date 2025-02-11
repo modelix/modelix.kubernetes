@@ -20,13 +20,15 @@ spec:
       containers:
       - name: keycloak
         image: "{{ .Values.dockerProxy.prefix }}modelix/keycloak:{{ .Values.imageTags.keycloak | default .Values.versions.modelix.kubernetes | default .Chart.Version }}"
-        args: ["start-dev", "--import-realm"]
+        args: ["start-dev", "--import-realm", "--optimized"]
         env:
+        - name: KC_HEALTH_ENABLED
+          value: "true"
         - name: KC_LOG_LEVEL
           value: "{{ .Values.keycloak.loglevel }}"
-        - name: KEYCLOAK_ADMIN
+        - name: KC_BOOTSTRAP_ADMIN_USERNAME
           value: "admin"
-        - name: KEYCLOAK_ADMIN_PASSWORD
+        - name: KC_BOOTSTRAP_ADMIN_PASSWORD
           value: "{{ .Values.keycloak.adminPassword }}"
         - name: KC_PROXY
           value: "edge"
@@ -78,17 +80,31 @@ spec:
         - name: debug
           containerPort: 8787
         {{ end }}
-#        readinessProbe:
-#          httpGet:
-#            path: /realms/master
-#            port: 8080
+        startupProbe:
+          httpGet:
+            path: /health/ready
+            port: 9000
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 9000
+          periodSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 9000
+          failureThreshold: 6
+          periodSeconds: 10
         resources:
           requests:
-            memory: "500Mi"
-            cpu: "0.1"
+            memory: "800Mi"
+            cpu: "1.0"
             ephemeral-storage: 500M
           limits:
-            memory: "500Mi"
+            memory: "800Mi"
             cpu: "1.0"
             ephemeral-storage: 1G
         volumeMounts:
