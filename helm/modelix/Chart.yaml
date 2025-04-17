@@ -33,3 +33,6 @@ dependencies:
     version: v1.11.0
     repository: https://charts.jetstack.io
     condition: certmanager.enabled
+  - name: kestra
+    repository: https://helm.kestra.io/
+    version: 0.22.2
