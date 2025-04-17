@@ -65,6 +65,10 @@ spec:
             value: localhost:5000
           - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
             value: "localhost:{{ .Values.internalDockerRegistry.nodePort }}"
+          - name: KESTRA_URL
+            value: http://{{ .Release.Name }}-kestra-service:8080/
+          - name: GIT_IMPORT_IMAGE
+            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-git-import:{{ .Values.versions.modelix.core }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
           {{- include "modelix.commonVariables" . | nindent 10 }}
         image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-manager:{{ .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"

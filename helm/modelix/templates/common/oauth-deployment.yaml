@@ -24,7 +24,7 @@ spec:
         {{- include "modelix.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - image: "{{ .Values.dockerProxy.prefix }}redis:7.0.2"
+        - image: "{{ .Values.dockerProxy.prefix }}redis:7.4.2"
           name: redis
           resources:
             requests:
@@ -45,7 +45,7 @@ spec:
             initialDelaySeconds: 3
             periodSeconds: 10
             timeoutSeconds: 5
-        - image: "{{ default .Values.dockerProxy.prefix "quay.io/" }}oauth2-proxy/oauth2-proxy:{{ .Values.imageTags.oauth | default "v7.8.1" }}"
+        - image: "{{ default .Values.dockerProxy.prefix "quay.io/" }}oauth2-proxy/oauth2-proxy:{{ .Values.imageTags.oauth | default "v7.8.2" }}"
           name: oauth2-proxy
           env:
           - name: OAUTH2_PROXY_CLIENT_SECRET

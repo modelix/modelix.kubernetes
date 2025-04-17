@@ -4,8 +4,8 @@ fullnameOverride: ""
 
 versions:
   modelix:
-    workspaces: "0.12.1"
-    core: "11.3.0"
+    workspaces: "0.13.0"
+    core: "14.4.3"
     kubernetes: ""
     vncBaseImage: "0.9.4"
 
@@ -62,6 +62,40 @@ certmanager:
   # installed before as described here:
   # https://cert-manager.io/docs/installation/helm/#option-1-installing-crds-with-kubectl
   enabled: false
+
+kestra:
+  configuration:
+    kestra:
+      basic-auth:
+        enabled: true
+        username: admin
+        password: secret
+      encryption:
+        secretKey: jhm3E/1WNE9EIiDsPptckrdgD4EsxaeaptnwlQyCDos=
+#    micronaut:
+#      server:
+#        contextPath: "kestra"
+  ingress:
+    enabled: false
+  postgresql:
+    enabled: true
+  dind:
+    image:
+      tag: dind
+    args:
+      - --log-level=fatal
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+#  readinessProbe:
+#    path: /kestra/health/readiness
+#  livenessProbe:
+#    path: /kestra/health/liveness
+#  startupProbe:
+#    path: /kestra/health
 
 db:
   useGCloud: false

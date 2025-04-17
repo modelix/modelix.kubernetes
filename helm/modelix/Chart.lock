@@ -5,5 +5,8 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.11.0
-digest: sha256:e1c91b6cbbad23e6af7930b3723474ada0ccc66de0e5aadfcceb305168434c65
-generated: "2023-05-02T15:38:43.774893577+02:00"
+- name: kestra
+  repository: https://helm.kestra.io/
+  version: 0.22.2
+digest: sha256:210d98f2461c18107f8ca4f0b9f959b0a9e411d00ff4f5dda5f9923058f42033
+generated: "2025-04-15T14:33:52.414036+02:00"

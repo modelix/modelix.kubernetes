@@ -12,6 +12,13 @@ handle_path /keycloak/* {
     reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}keycloak.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 }
 
+handle_path /kestra/* {
+    reverse_proxy {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
+}
+
+reverse_proxy /ui/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
+reverse_proxy /api/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
+
 reverse_proxy /workspace-* {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:33332
 
 reverse_proxy /resource/* {$KUBERNETES_INSTANCE_PREFIX}keycloak.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
