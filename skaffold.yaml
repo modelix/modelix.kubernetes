@@ -1,0 +1,27 @@
+# To learn more about the skaffold.yaml schema visit
+# https://skaffold.dev/docs/references/yaml/
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  local: {}
+
+deploy:
+  statusCheck: false
+  statusCheckDeadlineSeconds: 120
+  helm:
+    releases:
+      - name: dev
+        chartPath: helm/modelix
+        skipBuildDependencies: true
+        recreatePods: false
+        wait: true
+        setValueTemplates:
+          images.workspaceManager.repository: "{{.IMAGE_REPO_modelix_modelix_workspace_manager}}"
+          images.workspaceManager.tag: "{{.IMAGE_TAG_modelix_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_modelix_workspace_manager}}"
+        setValues:
+          ingress:
+            hostname: "localhost"
+            installController: true
+        
+requires:
+  - path: ../modelix.workspaces/skaffold.yaml

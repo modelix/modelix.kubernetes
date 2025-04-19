@@ -2,6 +2,44 @@
 nameOverride: ""
 fullnameOverride: ""
 
+images:
+  postgres:
+    repository: postgres
+    tag: 9.6
+    pullPolicy: IfNotPresent
+  dockerRegistry:
+    repository: registry
+    tag: 2.8.3
+    pullPolicy: IfNotPresent
+  keycloak:
+    repository: modelix/keycloak
+    tag: ""
+    pullPolicy: IfNotPresent
+  modelServer:
+    repository: modelix/model-server
+    tag: ""
+    pullPolicy: IfNotPresent
+  oauthProxy:
+    repository: oauth2-proxy/oauth2-proxy
+    tag: "v7.8.2"
+    pullPolicy: IfNotPresent
+  proxy:
+    repository: modelix/modelix-proxy
+    tag: ""
+    pullPolicy: IfNotPresent
+  workspaceManager:
+    repository: modelix/modelix-workspace-manager
+    tag: ""
+    pullPolicy: IfNotPresent
+  workspaceJob:
+    repository: modelix/modelix-workspace-job
+    tag: ""
+    pullPolicy: IfNotPresent
+  gitImport:
+    repository: modelix/mps-git-import
+    tag: ""
+    pullPolicy: IfNotPresent
+
 versions:
   modelix:
     workspaces: "0.13.0"
@@ -51,6 +89,7 @@ workspaces:
 ingress:
   installController: true
   hostname: "localhost"
+  ingressClassName: "nginx"
   port: ""
   certSecret: ""
   tls:
