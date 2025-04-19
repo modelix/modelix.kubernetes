@@ -4,7 +4,9 @@ apiVersion: skaffold/v4beta11
 kind: Config
 build:
   local: {}
-
+  artifacts:
+    - image: modelix/modelix-proxy
+      context: proxy
 deploy:
   statusCheck: false
   statusCheckDeadlineSeconds: 120
@@ -18,6 +20,10 @@ deploy:
         setValueTemplates:
           images.workspaceManager.repository: "{{.IMAGE_REPO_modelix_modelix_workspace_manager}}"
           images.workspaceManager.tag: "{{.IMAGE_TAG_modelix_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_modelix_workspace_manager}}"
+          images.modelServer.repository: "{{.IMAGE_REPO_modelix_model_server}}"
+          images.modelServer.tag: "{{.IMAGE_TAG_modelix_model_server}}@{{.IMAGE_DIGEST_modelix_model_server}}"
+          images.proxy.repository: "{{.IMAGE_REPO_modelix_modelix_proxy}}"
+          images.proxy.tag: "{{.IMAGE_TAG_modelix_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_modelix_proxy}}"
         setValues:
           ingress:
             hostname: "localhost"
@@ -25,3 +31,4 @@ deploy:
         
 requires:
   - path: ../modelix.workspaces/skaffold.yaml
+  - path: ../modelix.core/skaffold.yaml
