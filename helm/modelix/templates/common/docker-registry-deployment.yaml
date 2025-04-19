@@ -24,8 +24,8 @@ spec:
         {{- include "modelix.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - image: "{{ .Values.dockerProxy.prefix }}registry:{{ .Values.imageTags.registry | default 2 }}"
-          imagePullPolicy: IfNotPresent
+        - image: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.dockerRegistry.repository }}:{{ .Values.images.dockerRegistry.tag | default .Values.imageTags.registry | default 2 }}"
+          imagePullPolicy: {{ .Values.images.dockerRegistry.pullPolicy }}
           name: docker-registry
           ports:
             - containerPort: 5000

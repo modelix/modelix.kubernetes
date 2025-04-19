@@ -30,12 +30,9 @@ spec:
           value: "{{ .Values.db.db }}"
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
-        image: "{{ .Values.dockerProxy.prefix }}modelix/modelix-db:{{ .Values.imageTags.db | default .Values.versions.modelix.kubernetes | default .Chart.Version }}"
-        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.postgres.repository }}:{{ .Values.images.postgres.tag }}"
+        imagePullPolicy: {{ .Values.images.postgres.pullPolicy }}
         name: db
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: db-data
         resources:
           requests:
             memory: "500Mi"
@@ -53,10 +50,18 @@ spec:
             port: 5432
           initialDelaySeconds: 30
           periodSeconds: 10
-      restartPolicy: Always
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: db-data
+          - name: initdb
+            mountPath: /docker-entrypoint-initdb.d/initdb.sql
       volumes:
+      - name: initdb
+        configMap:
+          name: "{{ include "modelix.fullname" . }}-initdb"
       - name: db-data
         persistentVolumeClaim:
           claimName: "{{ include "modelix.fullname" . }}-db-data"
       {{- include "modelix.pullSecret" . | nindent 6 }}
+      restartPolicy: Always
 {{- end }}

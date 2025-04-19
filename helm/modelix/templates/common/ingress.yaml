@@ -13,7 +13,7 @@ metadata:
     cert-manager.io/cluster-issuer: "{{ include "modelix.fullname" . }}-letsencrypt-production"
     {{ end }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   tls:
   - hosts:
     - "{{ .Values.ingress.hostname }}"
