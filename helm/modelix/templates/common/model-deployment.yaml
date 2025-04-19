@@ -25,8 +25,14 @@ spec:
     spec:
       containers:
         - env:
-            - name: jdbc_url
+            - name: MODELIX_JDBC_URL
               value: jdbc:postgresql://{{ include "modelix.fullname" . }}-db:5432/
+            - name: MODELIX_JDBC_USER
+              value: modelix
+            - name: MODELIX_JDBC_PW
+              value: modelix
+            - name: MODELIX_JDBC_SCHEMA
+              value: modelix
             - name: "MODELIX_JWK_FILE_WORKSPACE_MANAGER"
               value: /secrets/jwk/wsmanager/workspace-manager-public.pem
             - name: "MODELIX_JWK_FILE_INSTANCES_MANAGER"
