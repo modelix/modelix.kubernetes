@@ -24,7 +24,10 @@ deploy:
           images.modelServer.tag: "{{.IMAGE_TAG_modelix_model_server}}@{{.IMAGE_DIGEST_modelix_model_server}}"
           images.proxy.repository: "{{.IMAGE_REPO_modelix_modelix_proxy}}"
           images.proxy.tag: "{{.IMAGE_TAG_modelix_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_modelix_proxy}}"
+          images.gitImport.repository: "{{.IMAGE_REPO_modelix_mps_git_import}}"
+          images.gitImport.tag: "{{.IMAGE_TAG_modelix_mps_git_import}}@{{.IMAGE_DIGEST_modelix_mps_git_import}}"
         setValues:
+          kestra.serviceAccountName: dev-modelix-sa
           ingress:
             hostname: "localhost"
             installController: true
