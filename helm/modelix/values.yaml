@@ -119,16 +119,7 @@ kestra:
   postgresql:
     enabled: true
   dind:
-    image:
-      tag: dind
-    args:
-      - --log-level=fatal
-    securityContext:
-      runAsUser: 0
-      runAsGroup: 0
-  securityContext:
-    runAsUser: 0
-    runAsGroup: 0
+    enabled: false
 #  readinessProbe:
 #    path: /kestra/health/readiness
 #  livenessProbe:
