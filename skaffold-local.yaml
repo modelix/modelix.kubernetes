@@ -1,0 +1,13 @@
+# To learn more about the skaffold.yaml schema visit
+# https://skaffold.dev/docs/references/yaml/
+apiVersion: skaffold/v4beta11
+kind: Config
+build:
+  local: {}
+  platforms: ["linux/amd64", "linux/arm64"]
+  artifacts:
+    - image: modelix-proxy
+      context: proxy
+    - image: modelix-keycloak
+      docker:
+        target: keycloak

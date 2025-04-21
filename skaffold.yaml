@@ -2,11 +2,6 @@
 # https://skaffold.dev/docs/references/yaml/
 apiVersion: skaffold/v4beta11
 kind: Config
-build:
-  local: {}
-  artifacts:
-    - image: modelix/modelix-proxy
-      context: proxy
 deploy:
   statusCheck: false
   statusCheckDeadlineSeconds: 120
@@ -18,14 +13,18 @@ deploy:
         recreatePods: false
         wait: true
         setValueTemplates:
-          images.workspaceManager.repository: "{{.IMAGE_REPO_modelix_modelix_workspace_manager}}"
-          images.workspaceManager.tag: "{{.IMAGE_TAG_modelix_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_modelix_workspace_manager}}"
-          images.modelServer.repository: "{{.IMAGE_REPO_modelix_model_server}}"
-          images.modelServer.tag: "{{.IMAGE_TAG_modelix_model_server}}@{{.IMAGE_DIGEST_modelix_model_server}}"
-          images.proxy.repository: "{{.IMAGE_REPO_modelix_modelix_proxy}}"
-          images.proxy.tag: "{{.IMAGE_TAG_modelix_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_modelix_proxy}}"
-          images.gitImport.repository: "{{.IMAGE_REPO_modelix_mps_git_import}}"
-          images.gitImport.tag: "{{.IMAGE_TAG_modelix_mps_git_import}}@{{.IMAGE_DIGEST_modelix_mps_git_import}}"
+          images.workspaceManager.repository: "{{.IMAGE_REPO_modelix_workspace_manager}}"
+          images.workspaceManager.tag: "{{.IMAGE_TAG_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_workspace_manager}}"
+          images.workspaceJob.repository: "{{.IMAGE_REPO_modelix_workspace_job}}"
+          images.workspaceJob.tag: "{{.IMAGE_TAG_modelix_workspace_job}}@{{.IMAGE_DIGEST_modelix_workspace_job}}"
+          images.modelServer.repository: "{{.IMAGE_REPO_model_server}}"
+          images.modelServer.tag: "{{.IMAGE_TAG_model_server}}@{{.IMAGE_DIGEST_model_server}}"
+          images.proxy.repository: "{{.IMAGE_REPO_modelix_proxy}}"
+          images.proxy.tag: "{{.IMAGE_TAG_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_proxy}}"
+          images.gitImport.repository: "{{.IMAGE_REPO_mps_git_import}}"
+          images.gitImport.tag: "{{.IMAGE_TAG_mps_git_import}}@{{.IMAGE_DIGEST_mps_git_import}}"
+          images.keycloak.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
+          images.keycloak.tag: "{{.IMAGE_TAG_modelix_keycloak}}@{{.IMAGE_DIGEST_modelix_keycloak}}"
         setValues:
           kestra.serviceAccountName: dev-modelix-sa
           ingress:
@@ -35,3 +34,4 @@ deploy:
 requires:
   - path: ../modelix.workspaces/skaffold.yaml
   - path: ../modelix.core/skaffold.yaml
+  - path: skaffold-local.yaml

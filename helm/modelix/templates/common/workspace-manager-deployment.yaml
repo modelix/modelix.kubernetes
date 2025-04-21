@@ -34,7 +34,7 @@ spec:
           - name: "WORKSPACE_JOB_IMAGE_NAME"
             value: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-job"
           - name: "WORKSPACE_JOB_IMAGE_VERSION"
-            value: "{{ .Values.imageTags.wsJob | default .Values.versions.modelix.workspaces | default .Chart.AppVersion }}"
+            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.workspaceJob.repository }}:{{ .Values.images.workspaceManager.tag }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
@@ -68,10 +68,10 @@ spec:
           - name: KESTRA_URL
             value: http://{{ .Release.Name }}-kestra-service:8080/
           - name: GIT_IMPORT_IMAGE
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.gitImport.repository }}:{{ .Values.images.gitImport.tag | default .Values.versions.modelix.core }}"
+            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.gitImport.repository }}:{{ .Values.images.gitImport.tag }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
           {{- include "modelix.commonVariables" . | nindent 10 }}
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.workspaceManager.repository }}:{{ .Values.images.workspaceManager.tag | default .Values.imageTags.wsManager | default .Values.versions.modelix.workspaces }}"
+        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.workspaceManager.repository }}:{{ .Values.images.workspaceManager.tag }}"
         imagePullPolicy: {{ .Values.images.workspaceManager.pullPolicy }}
         name: workspace-manager
         ports:

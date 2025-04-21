@@ -11,40 +11,37 @@ images:
     repository: registry
     tag: 2.8.3
     pullPolicy: IfNotPresent
-  keycloak:
-    repository: modelix/keycloak
-    tag: ""
-    pullPolicy: IfNotPresent
-  modelServer:
-    repository: modelix/model-server
-    tag: ""
-    pullPolicy: IfNotPresent
   oauthProxy:
     repository: oauth2-proxy/oauth2-proxy
     tag: "v7.8.2"
+    pullPolicy: IfNotPresent
+  modelServer:
+    repository: modelix/model-server
+    tag: "14.4.3-18d5bcd1"
+    pullPolicy: IfNotPresent
+  gitImport:
+    repository: modelix/mps-git-import
+    tag: "14.4.3-18d5bcd1"
+    pullPolicy: IfNotPresent
+  workspaceManager:
+    repository: modelix/modelix-workspace-manager
+    tag: "0.13.0-2f702fe7"
+    pullPolicy: IfNotPresent
+  workspaceJob:
+    repository: modelix/modelix-workspace-job
+    tag: "0.13.0-2f702fe7"
     pullPolicy: IfNotPresent
   proxy:
     repository: modelix/modelix-proxy
     tag: ""
     pullPolicy: IfNotPresent
-  workspaceManager:
-    repository: modelix/modelix-workspace-manager
-    tag: ""
-    pullPolicy: IfNotPresent
-  workspaceJob:
-    repository: modelix/modelix-workspace-job
-    tag: ""
-    pullPolicy: IfNotPresent
-  gitImport:
-    repository: modelix/mps-git-import
+  keycloak:
+    repository: modelix/modelix-keycloak
     tag: ""
     pullPolicy: IfNotPresent
 
 versions:
   modelix:
-    workspaces: "0.13.0"
-    core: "14.4.3"
-    kubernetes: ""
     vncBaseImage: "0.9.4"
 
 imageTags:
