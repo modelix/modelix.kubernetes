@@ -17,6 +17,8 @@ updates:
       interval: "daily"
   - package-ecosystem: "docker"
     open-pull-requests-limit: 20
-    directory: "/"
+    directories:
+      - "/"
+      - "/helm/modelix"
     schedule:
       interval: "daily"
