@@ -1,5 +1,5 @@
 [versions]
-keycloak="26.1.1"
+keycloak="26.2.0"
 
 [libraries]
 keycloak-core = { group = "org.keycloak", name = "keycloak-core", version.ref = "keycloak" }
