@@ -31,9 +31,7 @@ spec:
             value: http://{{ include "modelix.fullname" . }}-model:28101/
           - name: "KUBERNETES_NAMESPACE"
             value: {{ .Release.Namespace }}
-          - name: "WORKSPACE_JOB_IMAGE_NAME"
-            value: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-job"
-          - name: "WORKSPACE_JOB_IMAGE_VERSION"
+          - name: "WORKSPACE_JOB_IMAGE"
             value: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.job.image.repository }}:{{ .Values.workspaces.job.image.tag }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
@@ -109,8 +107,13 @@ spec:
           - name: "{{ include "modelix.fullname" . }}-workspace-manager-rsa-keys"
             mountPath: /secrets/jwk/wsmanager
             readOnly: true
+          - name: workspace-client-templates
+            mountPath: /workspace-client-templates
       restartPolicy: Always
       volumes:
+        - name: workspace-client-templates
+          configMap:
+            name: "{{ include "modelix.fullname" . }}-workspace-client-templates"
         - name: "{{ include "modelix.fullname" . }}-workspace-uploads"
           persistentVolumeClaim:
             claimName: "{{ include "modelix.fullname" . }}-workspace-uploads"
