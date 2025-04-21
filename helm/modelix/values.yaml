@@ -128,7 +128,7 @@ db:
 postgres:
   image:
     repository: postgres
-    tag: 9.6
+    tag: 17.4
     pullPolicy: IfNotPresent
 
 dockerProxy:
