@@ -5,31 +5,31 @@ fullnameOverride: ""
 images:
   postgres:
     repository: postgres
-    tag: 9.6 # {@link docker://docker.io/library/postgres}
+    tag: 9.6
     pullPolicy: IfNotPresent
   dockerRegistry:
     repository: registry
-    tag: 2.8.3 # {@link docker://docker.io/library/registry}
+    tag: 2.8.3
     pullPolicy: IfNotPresent
   oauthProxy:
     repository: oauth2-proxy/oauth2-proxy
-    tag: "v7.8.2" # {@link docker://quay.io/oauth2-proxy/oauth2-proxy}
+    tag: "v7.8.2"
     pullPolicy: IfNotPresent
   modelServer:
     repository: modelix/model-server
-    tag: "14.4.3-18d5bcd1" # {@link docker://docker.io/modelix/model-server}
+    tag: "14.4.3-18d5bcd1"
     pullPolicy: IfNotPresent
   gitImport:
     repository: modelix/mps-git-import
-    tag: "14.4.3-18d5bcd1" # {@link docker://docker.io/modelix/mps-git-import}
+    tag: "14.4.3-18d5bcd1"
     pullPolicy: IfNotPresent
   workspaceManager:
     repository: modelix/modelix-workspace-manager
-    tag: "0.13.0-2f702fe7" # {@link docker://docker.io/modelix/modelix-workspace-manager}
+    tag: "0.13.0-2f702fe7"
     pullPolicy: IfNotPresent
   workspaceJob:
     repository: modelix/modelix-workspace-job
-    tag: "0.13.0-2f702fe7" # {@link docker://docker.io/modelix/modelix-workspace-job}
+    tag: "0.13.0-2f702fe7"
     pullPolicy: IfNotPresent
   proxy:
     repository: modelix/modelix-proxy
