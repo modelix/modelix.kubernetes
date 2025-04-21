@@ -34,7 +34,7 @@ spec:
           - name: "WORKSPACE_JOB_IMAGE_NAME"
             value: "{{ .Values.dockerProxy.prefix }}modelix/modelix-workspace-job"
           - name: "WORKSPACE_JOB_IMAGE_VERSION"
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.workspaceJob.repository }}:{{ .Values.images.workspaceManager.tag }}"
+            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.job.image.repository }}:{{ .Values.workspaces.job.image.tag }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
@@ -59,8 +59,6 @@ spec:
             value: "{{ .Release.Namespace }}"
           - name: WORKSPACE_CLIENT_PREFIX
             value: "{{ include "modelix.fullname" . }}-wsclt-"
-          - name: WORKSPACE_CLIENT_IMAGE
-            value: "modelix/modelix-workspace-client:{{ .Values.imageTags.wsClient | default .Chart.AppVersion }}"
           - name: WORKSPACE_DOCKER_REGISTRY
             value: localhost:5000
           - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
@@ -68,17 +66,15 @@ spec:
           - name: KESTRA_URL
             value: http://{{ .Release.Name }}-kestra-service:8080/
           - name: GIT_IMPORT_IMAGE
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.gitImport.repository }}:{{ .Values.images.gitImport.tag }}"
+            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.gitImport.image.repository }}:{{ .Values.gitImport.image.tag }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
           {{- include "modelix.commonVariables" . | nindent 10 }}
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.images.workspaceManager.repository }}:{{ .Values.images.workspaceManager.tag }}"
-        imagePullPolicy: {{ .Values.images.workspaceManager.pullPolicy }}
+        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.manager.image.repository }}:{{ .Values.workspaces.manager.image.tag }}"
+        imagePullPolicy: {{ .Values.workspaces.manager.image.pullPolicy }}
         name: workspace-manager
         ports:
         - containerPort: 28104
           name: "http"
-        - containerPort: 5071
-          name: "jvm-debug"
         - containerPort: 33332
           name: "proxy"
         resources: 

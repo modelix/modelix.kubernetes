@@ -25,8 +25,8 @@ spec:
     spec:
       containers:
       - name: proxy
-        image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.proxy.repository}}:{{ .Values.images.proxy.tag | default .Chart.Version }}"
-        imagePullPolicy: {{.Values.images.proxy.pullPolicy}}
+        image: "{{ .Values.dockerProxy.prefix }}{{.Values.proxy.image.repository}}:{{ .Values.proxy.image.tag | default .Chart.Version }}"
+        imagePullPolicy: {{.Values.proxy.image.pullPolicy}}
         env:
           - name: KUBERNETES_NAMESPACE
             value: "{{ .Release.Namespace }}"

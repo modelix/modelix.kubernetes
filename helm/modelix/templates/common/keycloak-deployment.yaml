@@ -19,9 +19,9 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.keycloak.repository}}:{{ .Values.images.keycloak.tag | default .Chart.Version }}"
-        imagePullPolicy: {{.Values.images.keycloak.pullPolicy}}
-        args: ["start-dev", "--import-realm", "--optimized"]
+        image: "{{ .Values.dockerProxy.prefix }}{{.Values.keycloak.image.repository}}:{{ .Values.keycloak.image.tag | default .Chart.Version }}"
+        imagePullPolicy: {{.Values.keycloak.image.pullPolicy}}
+        args: ["start-dev", "--import-realm"{{ if .Values.keycloak.optimizedStartup }}, "--optimized"{{ end }}]
         env:
         - name: KC_HEALTH_ENABLED
           value: "true"
