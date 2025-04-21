@@ -40,16 +40,6 @@ spec:
           limits:
             memory: "500Mi"
             cpu: "1.0"
-        readinessProbe:
-          tcpSocket:
-            port: 5432
-          initialDelaySeconds: 1
-          periodSeconds: 3
-        livenessProbe:
-          tcpSocket:
-            port: 5432
-          initialDelaySeconds: 30
-          periodSeconds: 10
         volumeMounts:
           - mountPath: /var/lib/postgresql/data
             name: db-data
