@@ -17,13 +17,13 @@ oauthProxy:
 modelServer:
   image:
     repository: modelix/model-server
-    tag: "14.4.3-18d5bcd1"
+    tag: "14.5.0"
     pullPolicy: IfNotPresent
 
 gitImport:
   image:
     repository: modelix/mps-git-import
-    tag: "14.4.3-18d5bcd1"
+    tag: "14.5.0"
     pullPolicy: IfNotPresent
 
 proxy:
@@ -64,7 +64,7 @@ workspaces:
     memory: 600Mi
     image:
       repository: modelix/modelix-workspace-manager
-      tag: "0.13.0-2f702fe7"
+      tag: "0.14.1"
       pullPolicy: IfNotPresent
   client:
     # Ports as numbers which should be exposed from MPS.
@@ -74,7 +74,7 @@ workspaces:
   job:
     image:
       repository: modelix/modelix-workspace-job
-      tag: "0.13.0-2f702fe7"
+      tag: "0.14.1"
       pullPolicy: IfNotPresent
 
 ingress:
