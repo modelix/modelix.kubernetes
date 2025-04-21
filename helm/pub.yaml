@@ -1,8 +1,0 @@
-ingress:
-  installController: true
-  hostname: "server.modelix.org"
-keycloak:
-  loglevel: "warn"
-  debug: false
-workspaces:
-  enabled: true

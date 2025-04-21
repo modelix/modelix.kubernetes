@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.keycloak.repository}}:{{ .Values.images.keycloak.tag | default .Values.imageTags.keycloak | default .Values.versions.modelix.kubernetes | default .Chart.Version }}"
+        image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.keycloak.repository}}:{{ .Values.images.keycloak.tag | default .Chart.Version }}"
         imagePullPolicy: {{.Values.images.keycloak.pullPolicy}}
         args: ["start-dev", "--import-realm", "--optimized"]
         env:

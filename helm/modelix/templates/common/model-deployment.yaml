@@ -43,10 +43,10 @@ spec:
               value: "{{ include "modelix.externalKeycloakUrl" . }}realms/{{ .Values.keycloak.realm }}/protocol/openid-connect/token"
             - name: MODELIX_PERMISSION_CHECKS_ENABLED
               value: "true"
-            - name: JAVA_OPTS
-              value: "-Xms1000m -Xmx1000m"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:+PrintFlagsFinal -Xms1000m -Xmx1000m"
             {{- include "modelix.authorizationConfig" . | nindent 12 }}
-          image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.modelServer.repository}}:{{ .Values.images.modelServer.tag | default .Values.imageTags.model | default .Values.versions.modelix.core }}"
+          image: "{{ .Values.dockerProxy.prefix }}{{.Values.images.modelServer.repository}}:{{ .Values.images.modelServer.tag }}"
           imagePullPolicy: {{.Values.images.modelServer.pullPolicy}}
           name: model
           ports:

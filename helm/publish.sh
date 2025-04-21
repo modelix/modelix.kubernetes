@@ -6,7 +6,9 @@ set -o xtrace
 cd "$(dirname "$0")"
 
 HELM_CHART_VERSION="$(cat ../helm-chart-version.txt)"
-./update-versions.sh
+
+sed -i.bak -E "s/^appVersion:.*/appVersion: \"${HELM_CHART_VERSION}\"/" modelix/Chart.yaml
+sed -i.bak -E "s/^version:.*/version: \"${HELM_CHART_VERSION}\"/" modelix/Chart.yaml
 
 mkdir -p repo
 cd repo
