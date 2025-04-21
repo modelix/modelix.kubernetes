@@ -13,19 +13,20 @@ deploy:
         recreatePods: false
         wait: true
         setValueTemplates:
-          images.workspaceManager.repository: "{{.IMAGE_REPO_modelix_workspace_manager}}"
-          images.workspaceManager.tag: "{{.IMAGE_TAG_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_workspace_manager}}"
-          images.workspaceJob.repository: "{{.IMAGE_REPO_modelix_workspace_job}}"
-          images.workspaceJob.tag: "{{.IMAGE_TAG_modelix_workspace_job}}@{{.IMAGE_DIGEST_modelix_workspace_job}}"
-          images.modelServer.repository: "{{.IMAGE_REPO_model_server}}"
-          images.modelServer.tag: "{{.IMAGE_TAG_model_server}}@{{.IMAGE_DIGEST_model_server}}"
-          images.proxy.repository: "{{.IMAGE_REPO_modelix_proxy}}"
-          images.proxy.tag: "{{.IMAGE_TAG_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_proxy}}"
-          images.gitImport.repository: "{{.IMAGE_REPO_mps_git_import}}"
-          images.gitImport.tag: "{{.IMAGE_TAG_mps_git_import}}@{{.IMAGE_DIGEST_mps_git_import}}"
-          images.keycloak.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
-          images.keycloak.tag: "{{.IMAGE_TAG_modelix_keycloak}}@{{.IMAGE_DIGEST_modelix_keycloak}}"
+          workspaces.manager.image.repository: "{{.IMAGE_REPO_modelix_workspace_manager}}"
+          workspaces.manager.image.tag: "{{.IMAGE_TAG_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_workspace_manager}}"
+          workspaces.job.image.repository: "{{.IMAGE_REPO_modelix_workspace_job}}"
+          workspaces.job.image.tag: "{{.IMAGE_TAG_modelix_workspace_job}}@{{.IMAGE_DIGEST_modelix_workspace_job}}"
+          modelServer.image.repository: "{{.IMAGE_REPO_model_server}}"
+          modelServer.image.tag: "{{.IMAGE_TAG_model_server}}@{{.IMAGE_DIGEST_model_server}}"
+          proxy.image.repository: "{{.IMAGE_REPO_modelix_proxy}}"
+          proxy.image.tag: "{{.IMAGE_TAG_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_proxy}}"
+          gitImport.image.repository: "{{.IMAGE_REPO_mps_git_import}}"
+          gitImport.image.tag: "{{.IMAGE_TAG_mps_git_import}}@{{.IMAGE_DIGEST_mps_git_import}}"
+          keycloak.image.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
+          keycloak.image.tag: "{{.IMAGE_TAG_modelix_keycloak}}@{{.IMAGE_DIGEST_modelix_keycloak}}"
         setValues:
+          keycloak.optimizedStartup: false
           kestra.serviceAccountName: dev-modelix-sa
           ingress:
             hostname: "localhost"

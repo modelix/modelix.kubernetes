@@ -45,8 +45,8 @@ spec:
             initialDelaySeconds: 3
             periodSeconds: 10
             timeoutSeconds: 5
-        - image: "{{ default .Values.dockerProxy.prefix "quay.io/" }}{{.Values.images.oauthProxy.repository}}:{{ .Values.images.oauthProxy.tag | default .Values.imageTags.oauth | default "v7.8.2" }}"
-          imagePullPolicy: {{.Values.images.oauthProxy.pullPolicy}}
+        - image: "{{ .Values.dockerProxy.prefix }}{{.Values.oauthProxy.image.repository}}:{{ .Values.oauthProxy.image.tag }}"
+          imagePullPolicy: {{.Values.oauthProxy.image.pullPolicy}}
           name: oauth2-proxy
           env:
           - name: OAUTH2_PROXY_CLIENT_SECRET

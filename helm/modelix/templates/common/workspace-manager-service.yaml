@@ -12,9 +12,6 @@ spec:
   - name: "http"
     port: 28104
     targetPort: 28104
-  - name: "debug"
-    port: 5071
-    targetPort: 5071
   - name: "proxy"
     port: 33332
     targetPort: 33332

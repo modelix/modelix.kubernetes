@@ -2,59 +2,39 @@
 nameOverride: ""
 fullnameOverride: ""
 
-images:
-  postgres:
-    repository: postgres
-    tag: 9.6
-    pullPolicy: IfNotPresent
-  dockerRegistry:
+dockerRegistry:
+  image:
     repository: registry
     tag: 2.8.3
     pullPolicy: IfNotPresent
-  oauthProxy:
-    repository: oauth2-proxy/oauth2-proxy
+
+oauthProxy:
+  image:
+    repository: quay.io/oauth2-proxy/oauth2-proxy
     tag: "v7.8.2"
     pullPolicy: IfNotPresent
-  modelServer:
+
+modelServer:
+  image:
     repository: modelix/model-server
     tag: "14.4.3-18d5bcd1"
     pullPolicy: IfNotPresent
-  gitImport:
+
+gitImport:
+  image:
     repository: modelix/mps-git-import
     tag: "14.4.3-18d5bcd1"
     pullPolicy: IfNotPresent
-  workspaceManager:
-    repository: modelix/modelix-workspace-manager
-    tag: "0.13.0-2f702fe7"
-    pullPolicy: IfNotPresent
-  workspaceJob:
-    repository: modelix/modelix-workspace-job
-    tag: "0.13.0-2f702fe7"
-    pullPolicy: IfNotPresent
-  proxy:
+
+proxy:
+  image:
     repository: modelix/modelix-proxy
-    tag: ""
-    pullPolicy: IfNotPresent
-  keycloak:
-    repository: modelix/modelix-keycloak
     tag: ""
     pullPolicy: IfNotPresent
 
 versions:
   modelix:
     vncBaseImage: "0.9.4"
-
-imageTags:
-  db: ""
-  instancesManager: ""
-  model: ""
-  registry: ""
-  oauth: ""
-  proxy: ""
-  keycloak: ""
-  wsClient: ""
-  wsManager: ""
-  wsJob: ""
 
 modelStorageSize: 3000Mi
 
@@ -71,17 +51,31 @@ keycloak:
   clientSecret: ""
   loglevel: "warn"
   debug: false
+  optimizedStartup: false
+  image:
+    repository: modelix/modelix-keycloak
+    tag: ""
+    pullPolicy: IfNotPresent
 
 workspaces:
   enabled: true
   uploadsStorageSize: 5000Mi
   manager:
     memory: 600Mi
+    image:
+      repository: modelix/modelix-workspace-manager
+      tag: "0.13.0-2f702fe7"
+      pullPolicy: IfNotPresent
   client:
     # Ports as numbers which should be exposed from MPS.
     #
     # A use case is exposing custom servers running inside MPS.
     customExposedPorts: []
+  job:
+    image:
+      repository: modelix/modelix-workspace-job
+      tag: "0.13.0-2f702fe7"
+      pullPolicy: IfNotPresent
 
 ingress:
   installController: true
@@ -130,6 +124,12 @@ db:
   password: "modelix"
   db: "modelix"
   storage: 3000Mi
+
+postgres:
+  image:
+    repository: postgres
+    tag: 9.6
+    pullPolicy: IfNotPresent
 
 dockerProxy:
   prefix: ""
