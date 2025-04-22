@@ -128,9 +128,15 @@ db:
 
 postgres:
   image:
-    repository: pgautoupgrade/pgautoupgrade
-    tag: 17-alpine@sha256:17327a45cf07bda0d1479aa14f611b6a6efd7249b538b8acf644372766a21098
+    repository: postgres
+    tag: 17.4@sha256:fe3f571d128e8efadcd8b2fde0e2b73ebab6dbec33f6bfe69d98c682c7d8f7bd
     pullPolicy: IfNotPresent
+  autoupgrade:
+    enabled: false
+    image:
+      repository: pgautoupgrade/pgautoupgrade
+      tag: 17-alpine@sha256:17327a45cf07bda0d1479aa14f611b6a6efd7249b538b8acf644372766a21098
+      pullPolicy: IfNotPresent
 
 dockerProxy:
   prefix: ""

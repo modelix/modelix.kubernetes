@@ -30,8 +30,13 @@ spec:
           value: "{{ .Values.db.db }}"
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
+        {{ if .Values.postgres.autoupgrade.enabled }}
+        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.autoupgrade.image.repository }}:{{ .Values.postgres.autoupgrade.image.tag }}"
+        imagePullPolicy: {{ .Values.postgres.autoupgrade.image.pullPolicy }}
+        {{ else }}
         image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
         imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+        {{ end }}
         name: db
         resources:
           requests:
