@@ -46,7 +46,7 @@ jobs:
             skaffold
           skaffold: 2.15.0
       - name: Build and Push Images
-        run: skaffold build --filename='skaffold-local.yaml' --push --default-repo="docker.io/modelix" --tag="${GITHUB_REF#refs/*/}"
+        run: skaffold build --filename='skaffold-build.yaml' --push --default-repo="docker.io/modelix" --tag="${GITHUB_REF#refs/*/}"
 
       - name: Publish Helm Chart
         env:
