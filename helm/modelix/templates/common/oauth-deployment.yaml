@@ -87,7 +87,7 @@ spec:
             - --skip-jwt-bearer-tokens=true
             - --skip-provider-button=true
             - --http-address=0.0.0.0:4180
-            - --pass-user-headers=true
+            - --reverse-proxy=true
           readinessProbe:
             httpGet:
               path: /ping
