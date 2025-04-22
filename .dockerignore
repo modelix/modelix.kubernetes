@@ -1,0 +1,13 @@
+/.github
+/.idea
+/proxy
+/helm
+/.gitignore
+/.releaserc.yaml
+/helm-chart-version.txt
+/package.json
+/package-lock.json
+/README.md
+/skaffold.yaml
+/skaffold-build.yaml
+/keycloak-extensions/build
