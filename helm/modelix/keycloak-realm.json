@@ -2375,8 +2375,7 @@
     "cibaExpiresIn": "120",
     "oauth2DeviceCodeLifespan": "600",
     "parRequestUriLifespan": "60",
-    "clientSessionMaxLifespan": "0",
-    "frontendUrl": "${REALM_FRONTEND_URL}"
+    "clientSessionMaxLifespan": "0"
   },
   "keycloakVersion": "18.0.1",
   "userManagedAccessAllowed": true,
