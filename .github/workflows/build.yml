@@ -31,4 +31,4 @@ jobs:
             skaffold
           skaffold: 2.15.0
       - name: Build Images
-        run: skaffold build --filename='skaffold-local.yaml' --push=false --disable-multi-platform-build=true
+        run: skaffold build --filename='skaffold-build.yaml' --push=false --disable-multi-platform-build=true

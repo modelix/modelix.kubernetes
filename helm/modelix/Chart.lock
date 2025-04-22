@@ -1,12 +1,6 @@
 dependencies:
-- name: ingress-nginx
-  repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.2.5
-- name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.11.0
 - name: kestra
   repository: https://helm.kestra.io/
   version: 0.22.2
-digest: sha256:cee2d7b0c20eb4cd9ec827ce1319bad22174516c2b779afc7a9b42823c0d68b3
-generated: "2025-04-19T12:50:24.134269+02:00"
+digest: sha256:e89bdc37e7d2b75d2fe5e75fdf40ee6f199f28924a652cd7d4f4f5312a083bb9
+generated: "2025-04-22T12:29:43.185365+02:00"

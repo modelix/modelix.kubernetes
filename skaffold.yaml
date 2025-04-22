@@ -2,6 +2,10 @@
 # https://skaffold.dev/docs/references/yaml/
 apiVersion: skaffold/v4beta11
 kind: Config
+requires:
+  - path: ../modelix.workspaces/skaffold.yaml
+  - path: ../modelix.core/skaffold.yaml
+  - path: skaffold-build.yaml
 deploy:
   statusCheck: false
   statusCheckDeadlineSeconds: 120
@@ -12,6 +16,8 @@ deploy:
         skipBuildDependencies: true
         recreatePods: false
         wait: true
+        namespace: modelix-dev
+        createNamespace: true
         setValueTemplates:
           workspaces.manager.image.repository: "{{.IMAGE_REPO_modelix_workspace_manager}}"
           workspaces.manager.image.tag: "{{.IMAGE_TAG_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_workspace_manager}}"
@@ -26,13 +32,6 @@ deploy:
           keycloak.image.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
           keycloak.image.tag: "{{.IMAGE_TAG_modelix_keycloak}}@{{.IMAGE_DIGEST_modelix_keycloak}}"
         setValues:
+          ingress.hostname: "localhost"
           keycloak.optimizedStartup: false
           kestra.serviceAccountName: dev-modelix-sa
-          ingress:
-            hostname: "localhost"
-            installController: true
-        
-requires:
-  - path: ../modelix.workspaces/skaffold.yaml
-  - path: ../modelix.core/skaffold.yaml
-  - path: skaffold-local.yaml
