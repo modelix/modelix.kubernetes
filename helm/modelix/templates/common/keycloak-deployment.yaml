@@ -21,7 +21,27 @@ spec:
       - name: keycloak
         image: "{{ .Values.dockerProxy.prefix }}{{.Values.keycloak.image.repository}}:{{ .Values.keycloak.image.tag | default .Chart.Version }}"
         imagePullPolicy: {{.Values.keycloak.image.pullPolicy}}
-        args: ["start-dev", "--import-realm"{{ if .Values.keycloak.optimizedStartup }}, "--optimized"{{ end }}]
+        args:
+        - "start-dev"
+        - --import-realm
+        - --http-enabled=true
+        - --health-enabled=true
+        - --hostname
+        - {{ include "modelix.externalKeycloakUrl" . }}
+        - --hostname-backchannel-dynamic=true
+        - --proxy-headers=xforwarded
+        - --hostname-debug=true
+        - --db
+        - postgres
+        - --db-password
+        - {{ .Values.db.user }}
+        - --db-username
+        - {{ .Values.db.user }}
+        - --db-url
+        - jdbc:postgresql://{{ include "modelix.fullname" . }}-db:5432/
+        {{ if .Values.keycloak.optimizedStartup }}
+        - --optimized"
+        {{ end }}
         env:
         - name: KC_HEALTH_ENABLED
           value: "true"
@@ -31,38 +51,6 @@ spec:
           value: "admin"
         - name: KC_BOOTSTRAP_ADMIN_PASSWORD
           value: "{{ .Values.keycloak.adminPassword }}"
-        - name: KC_PROXY
-          value: "edge"
-        - name: PROXY_ADDRESS_FORWARDING
-          value: "true"
-        - name: KC_DB
-          value: "postgres"
-        - name: KC_DB_USERNAME
-          value: "{{ .Values.db.user }}"
-        - name: KC_DB_PASSWORD
-          value: "{{ .Values.db.password }}"
-        - name: KC_DB_URL
-          value: "jdbc:postgresql://{{ include "modelix.fullname" . }}-db:5432/"
-        #- name: KC_HOSTNAME_ADMIN
-        #  value: "kcadmin.{{ .Values.ingress.hostname }}"
-        #- name: KC_HOSTNAME
-        #  value: "kc.{{ .Values.ingress.hostname }}"
-        #- name: KC_HOSTNAME_STRICT
-        #  value: "true"
-        #- name: KC_HOSTNAME_PATH
-        #  value: "/"
-        #- name: KC_HOSTNAME_PORT
-        #  value: "{{ .Values.ingress.port }}"
-        - name: KC_HOSTNAME_STRICT_HTTPS
-          value: "true"
-        - name: KEYCLOAK_FRONTEND_URL
-          value: "{{ include "modelix.externalKeycloakUrl" . }}auth"
-        - name: REALM_FRONTEND_URL
-          value: "{{ include "modelix.externalKeycloakUrl" . }}"
-        - name: REALM_BACKEND_URL
-          value: "{{ include "modelix.internalKeycloakUrl" . }}"
-        - name: KC_HOSTNAME_STRICT
-          value: "false"
         - name: REALM_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
