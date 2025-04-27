@@ -12,6 +12,10 @@ handle_path /kestra/* {
     reverse_proxy {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 }
 
+handle_path /modelix/workspaces/* {
+    reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28104
+}
+
 reverse_proxy /ui/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 reverse_proxy /api/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
 
