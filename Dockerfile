@@ -3,7 +3,7 @@ FROM gradle:8.13.0-jdk17 AS builder
 COPY ./ /project
 RUN cd /project && gradle assemble
 
-FROM quay.io/keycloak/keycloak:26.2.0 AS keycloak
+FROM quay.io/keycloak/keycloak:26.2.2 AS keycloak
 
 WORKDIR /opt/keycloak
 COPY --from=builder /project/keycloak-extensions/build/libs/keycloak-extensions.jar /opt/keycloak/providers/org.modelix.keycloak.extensions.jar
