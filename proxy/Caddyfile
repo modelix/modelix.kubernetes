@@ -1,5 +1,8 @@
 :80
 
+reverse_proxy /modelix/maven-connector/* {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28104
+reverse_proxy /modelix/workspaces/* {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28104
+
 handle_path /model/* {
     reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}model.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28101
 }
@@ -10,10 +13,6 @@ handle_path /workspace-manager/* {
 
 handle_path /kestra/* {
     reverse_proxy {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
-}
-
-handle_path /modelix/workspaces/* {
-    reverse_proxy {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:28104
 }
 
 reverse_proxy /ui/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}.svc.cluster.local:8080
