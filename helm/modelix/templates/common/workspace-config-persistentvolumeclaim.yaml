@@ -12,5 +12,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  {{ if not (empty .Values.storageClassName) }}
   storageClassName: {{ .Values.storageClassName }}
+  {{ end }}
 {{- end -}}

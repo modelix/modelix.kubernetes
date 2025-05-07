@@ -12,5 +12,7 @@ spec:
   resources:
     requests:
       storage: {{ .Values.workspaces.uploadsStorageSize }}
+  {{ if not (empty .Values.storageClassName) }}
   storageClassName: {{ .Values.storageClassName }}
+  {{ end }}
 {{- end -}}
