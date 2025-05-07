@@ -160,3 +160,5 @@ authorization:
   enabled: true
 
 httpProxy: ""
+
+storageClassName: ""
