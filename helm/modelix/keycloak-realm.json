@@ -932,7 +932,6 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "id": "db9f56aa-cf90-4a17-93b6-d047b768698e",
           "name": "Client Host",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper",
@@ -947,7 +946,6 @@
           }
         },
         {
-          "id": "57adb255-e144-4899-a5d9-3d2ac9ec19c2",
           "name": "Client ID",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper",
@@ -962,7 +960,6 @@
           }
         },
         {
-          "id": "1dac24c5-a925-42da-9d52-bd8b735bc741",
           "name": "Client IP Address",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper",
