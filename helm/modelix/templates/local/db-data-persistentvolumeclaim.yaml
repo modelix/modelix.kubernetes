@@ -11,5 +11,7 @@ spec:
   resources:
     requests:
       storage: {{ .Values.db.storage }}
+  {{ if not (empty .Values.storageClassName) }}
   storageClassName: {{ .Values.storageClassName }}
+  {{ end }}
 {{- end }}
