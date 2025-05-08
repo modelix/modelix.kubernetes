@@ -5,6 +5,7 @@ keycloak="26.3.0"
 keycloak-core = { group = "org.keycloak", name = "keycloak-core", version.ref = "keycloak" }
 keycloak-server-spi = { group = "org.keycloak", name = "keycloak-server-spi", version.ref = "keycloak" }
 keycloak-server-spi-private = { group = "org.keycloak", name = "keycloak-server-spi-private", version.ref = "keycloak" }
+modelix-dashboard = { group = "org.modelix", name = "dashboard-spa", version = "1.0.3" }
 
 [plugins]
 gitVersion = { id = "com.palantir.git-version", version = "4.0.0" }
