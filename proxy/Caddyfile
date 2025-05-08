@@ -24,7 +24,12 @@ reverse_proxy /api/* {$HELM_RELEASE_NAME}-kestra-service.{$KUBERNETES_NAMESPACE}
 
 reverse_proxy /workspace-* {$KUBERNETES_INSTANCE_PREFIX}workspace-manager.{$KUBERNETES_NAMESPACE}.svc.cluster.local:33332
 
-root * /usr/share/caddy/
-file_server
+handle_path /modelix/dashboard/* {
+    root * /usr/share/caddy/modelix/dashboard/
+    try_files {path} /index.html
+    file_server
+}
+
+redir / /modelix/dashboard/ permanent
 
 log
