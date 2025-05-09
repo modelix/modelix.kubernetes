@@ -84,6 +84,7 @@ spec:
             - --skip-auth-regex=\/model\/v2\/.* # Model server checks the bearer token itself. Model client needs the 401.
             - --skip-auth-regex=^\/$
             - --skip-auth-regex=\/public\/.*
+            - --skip-auth-regex=\/modelix\/.*
             - --skip-jwt-bearer-tokens=true
             - --skip-provider-button=true
             - --http-address=0.0.0.0:4180

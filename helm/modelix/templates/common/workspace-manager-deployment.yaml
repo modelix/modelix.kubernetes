@@ -61,6 +61,16 @@ spec:
             value: localhost:5000
           - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
             value: "localhost:{{ .Values.internalDockerRegistry.nodePort }}"
+          - name: INTERNAL_DOCKER_REGISTRY_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "{{ include "modelix.fullname" . }}-docker-registry-secret"
+          - name: INTERNAL_DOCKER_REGISTRY_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "{{ include "modelix.fullname" . }}-docker-registry-secret"
           - name: KESTRA_URL
             value: http://{{ .Release.Name }}-kestra-service:8080/
           - name: GIT_IMPORT_IMAGE
