@@ -1,7 +1,7 @@
 FROM gradle:8.14.0-jdk17 AS builder
 
 COPY ./ /project
-RUN cd /project && gradle assemble
+RUN cd /project && gradle :keycloak-extensions:assemble
 
 FROM quay.io/keycloak/keycloak:26.2.4 AS keycloak
 

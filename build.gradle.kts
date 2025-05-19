@@ -1,4 +1,5 @@
 plugins {
+    base
     alias(libs.plugins.gitVersion)
 }
 
@@ -18,10 +19,24 @@ fun computeVersion(): Any {
     }
 }
 
-subprojects {
+allprojects {
     repositories {
-        // It is useful to have the central maven repo before the Itemis's one as it is more reliable
         mavenCentral()
         maven { url = uri("https://artifacts.itemis.cloud/repository/maven-mps/") }
+        mavenLocal()
     }
+}
+
+val dashboard by configurations.creating
+dependencies {
+    dashboard(libs.modelix.dashboard)
+}
+
+val copyDashboard by tasks.registering(Sync::class) {
+    from(zipTree({ dashboard.singleFile }))
+    into(layout.projectDirectory.dir("proxy/dashboard"))
+}
+
+tasks.assemble {
+    dependsOn(copyDashboard)
 }

@@ -32,7 +32,28 @@ spec:
                 name: "{{ include "modelix.fullname" . }}-keycloak"
                 port:
                   number: 8080
-            path: /(resources|admin|js|realms)/.*
+            path: /resources/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /admin/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /js/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /realms/
           - pathType: Prefix
             backend:
               service:
