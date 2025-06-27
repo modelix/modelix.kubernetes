@@ -7,4 +7,4 @@ keycloak-server-spi = { group = "org.keycloak", name = "keycloak-server-spi", ve
 keycloak-server-spi-private = { group = "org.keycloak", name = "keycloak-server-spi-private", version.ref = "keycloak" }
 
 [plugins]
-gitVersion = { id = "com.palantir.git-version", version = "3.3.0" }
+gitVersion = { id = "com.palantir.git-version", version = "3.4.0" }
