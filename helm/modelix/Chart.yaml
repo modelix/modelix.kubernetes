@@ -23,7 +23,7 @@ version: "0.0.1"
 # It is recommended to use it with quotes.
 appVersion: "0.0.1"
 
-dependencies:
-  - name: kestra
-    repository: https://helm.kestra.io/
-    version: 0.22.2
+dependencies: []
+#  - name: kestra
+#    repository: https://helm.kestra.io/
+#    version: 0.22.2
