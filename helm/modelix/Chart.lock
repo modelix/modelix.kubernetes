@@ -1,6 +1,3 @@
-dependencies:
-- name: kestra
-  repository: https://helm.kestra.io/
-  version: 0.22.2
-digest: sha256:e89bdc37e7d2b75d2fe5e75fdf40ee6f199f28924a652cd7d4f4f5312a083bb9
-generated: "2025-04-22T12:29:43.185365+02:00"
+dependencies: []
+digest: sha256:643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726
+generated: "2025-07-02T13:20:16.59844+02:00"

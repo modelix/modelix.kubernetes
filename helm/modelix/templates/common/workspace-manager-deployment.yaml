@@ -39,6 +39,8 @@ spec:
             value: "{{ .Values.maxBodySize }}"
           - name: "MODELIX_JWK_FILE_WORKSPACE_MANAGER"
             value: /secrets/jwk/wsmanager/private.pem
+          - name: "MODELIX_JWK_FILE_WORKSPACE_MANAGER_PUBLIC"
+            value: /secrets/jwk/wsmanager/workspace-manager-public.pem
           - name: MPS_BASEIMAGE_VERSION
             value: {{ .Values.versions.modelix.vncBaseImage }}
           - name: MPS_BASEIMAGE_NAME
@@ -142,5 +144,7 @@ spec:
             items:
               - key: private
                 path: private.pem
+              - key: public
+                path: workspace-manager-public.pem
       {{- include "modelix.pullSecret" . | nindent 6 }}
 {{- end -}}
