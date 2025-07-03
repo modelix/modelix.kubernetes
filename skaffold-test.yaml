@@ -1,0 +1,28 @@
+# To learn more about the skaffold.yaml schema visit
+# https://skaffold.dev/docs/references/yaml/
+apiVersion: skaffold/v4beta11
+kind: Config
+requires:
+  - path: skaffold-build.yaml
+deploy:
+  statusCheck: false
+  statusCheckDeadlineSeconds: 600
+  helm:
+    releases:
+      - name: test
+        chartPath: helm/modelix
+        skipBuildDependencies: false
+        recreatePods: false
+        wait: true
+        namespace: modelix-test
+        createNamespace: true
+        setValueTemplates:
+          proxy.image.repository: "{{.IMAGE_REPO_modelix_proxy}}"
+          proxy.image.tag: "{{.IMAGE_TAG_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_proxy}}"
+          keycloak.image.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
+          keycloak.image.tag: "{{.IMAGE_TAG_modelix_keycloak}}@{{.IMAGE_DIGEST_modelix_keycloak}}"
+        setValues:
+          keycloak.optimizedStartup: false
+          kestra.serviceAccountName: test-modelix-sa
+          internalDockerRegistry.nodePort: "30035"
+          ingress.port: "20080"

@@ -8,6 +8,6 @@
 /package.json
 /package-lock.json
 /README.md
-/skaffold.yaml
+/skaffold-test.yaml
 /skaffold-build.yaml
 /keycloak-extensions/build

@@ -28,6 +28,9 @@ tasks {
     }
     test {
         dependsOn(exportWorkspaceManagerPrivateKey)
+        project.findProperty("modelix.baseurl")?.let {
+            environment("MODELIX_BASE_URL", it.toString().trimEnd('/'))
+        }
     }
 }
 
