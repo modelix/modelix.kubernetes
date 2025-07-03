@@ -26,10 +26,16 @@ import org.eclipse.jgit.http.server.GitServlet
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.modelix.authorization.ModelixJWTUtil
 import org.modelix.authorization.permissions.PermissionSchemaBase
+import org.modelix.model.api.BuiltinLanguages
+import org.modelix.model.api.getDescendants
+import org.modelix.model.api.getName
 import org.modelix.model.client2.ModelClientV2
+import org.modelix.model.client2.runWriteOnModel
 import org.modelix.model.historyAsSequence
 import org.modelix.model.lazy.CLVersion
 import org.modelix.model.lazy.RepositoryId
+import org.modelix.model.mutable.ModelixIdGenerator
+import org.modelix.model.mutable.asModelSingleThreaded
 import org.openapitools.client.apis.DraftsApi
 import org.openapitools.client.apis.GitBranchesApi
 import org.openapitools.client.apis.GitRepositoriesApi
@@ -54,7 +60,7 @@ import kotlin.time.Duration.Companion.seconds
 class DraftRebaseTest {
 
     @Test
-    fun test(): Unit = runBlocking { withTimeout(5.minutes) {
+    fun `changes from git can be merged after draft creation`(): Unit = runBlocking { withTimeout(5.minutes) {
         runWithGitRepository { gitUrl ->
             println("gitUrl: $gitUrl")
 
@@ -96,7 +102,10 @@ class DraftRebaseTest {
                 }
 
             }
-            val repositoriesApi = GitRepositoriesApi(httpClientConfig = httpClientConfig)
+            val baseUrl = System.getenv("MODELIX_BASE_URL") ?: "http://localhost"
+            val repositoriesApi = GitRepositoriesApi(baseUrl = baseUrl, httpClientConfig = httpClientConfig)
+            val branchesApi = GitBranchesApi(baseUrl = baseUrl, httpClientConfig = httpClientConfig)
+            val draftsApi = DraftsApi(baseUrl = baseUrl, httpClientConfig = httpClientConfig)
 
             // create new git repository
             val repositoryUUID = UUID.randomUUID()
@@ -116,7 +125,6 @@ class DraftRebaseTest {
             ).body()
 
             // branch list is initially empty
-            val branchesApi = GitBranchesApi(httpClientConfig = httpClientConfig)
             assertEquals(
                 branchesApi.listBranches(createdRepository.id.toString()).body().branches.map { it.name }.toSet(),
                 setOf()
@@ -131,7 +139,6 @@ class DraftRebaseTest {
             assertEquals(expectedRefs, branchesList.branches.associate { it.name to it.gitCommitHash })
 
             // create new draft
-            val draftsApi = DraftsApi(httpClientConfig = httpClientConfig)
             val draftUUID = UUID.randomUUID()
             val createdDraft = draftsApi.createDraftInRepository(createdRepository.id.toString(), DraftConfig(
                 id = draftUUID.toString(),
@@ -153,23 +160,29 @@ class DraftRebaseTest {
             }
 
             val modelClient = ModelClientV2.builder()
-                .url("http://localhost/model/")
+                .url("$baseUrl/model/")
                 .authToken { createAccessToken() }
                 .build()
 
             // check that the branch was created
             val repositoryId = RepositoryId(createdRepository.id.toString())
+            val draftBranchRef = repositoryId.getBranchReference("drafts/${createdDraft.id}")
             assertContains(modelClient.listRepositories(), repositoryId)
             assertEquals(
                 setOf(
                     repositoryId.getBranchReference(),
-                    repositoryId.getBranchReference("drafts/${createdDraft.id}"),
+                    draftBranchRef,
                     repositoryId.getBranchReference("git-import/branch-for-draft-rebase"),
                 ),
                 modelClient.listBranches(repositoryId).toSet()
             )
-            val version1 = modelClient.pull(repositoryId.getBranchReference("drafts/${createdDraft.id}"), null)
+            val version1 = modelClient.pull(draftBranchRef, null)
             assertEquals(expectedRefs["branch-for-draft-rebase"], version1.getAttributes()["git-commit"])
+
+            val versionChangedInDraft = modelClient.runWriteOnModel(draftBranchRef) { rootNode ->
+                val methodNode = rootNode.getDescendants(true).first { it.getName() == "f" }
+                methodNode.setPropertyValue(BuiltinLanguages.jetbrains_mps_lang_core.INamedConcept.name.toReference(), "renamedInDraft")
+            }
 
             // merge changes from main into the draft
             draftsApi.rebaseDraft(createdDraft.id.toString(), DraftRebaseJob(
@@ -183,11 +196,21 @@ class DraftRebaseTest {
             }
 
             // check merge result
-            val version2 = modelClient.pull(repositoryId.getBranchReference("drafts/${createdDraft.id}"), null) as CLVersion
+            val version2 = modelClient.pull(draftBranchRef, null) as CLVersion
             assertNotEquals(version1.getContentHash(), version2.getContentHash())
             val mergedHistory = version2.historyAsSequence().map { it.getAttributes()["git-commit"] }.toSet()
+
+            // A draft "rebase" currently actually just does a merge and all original commits are still expected to be
+            // part of the history.
             assertContains(mergedHistory, "aac3b37b4c6213f8057961a79814989b2cbf3007")
             assertContains(mergedHistory, "153318b1deac5ad0d3e351d624042e6d396005a9")
+            assertContains(version2.historyAsSequence().map { it.getObjectHash() }.toSet(), versionChangedInDraft.getObjectHash())
+
+            // The method renamed in the draft should still be there
+            assertContains(
+                version2.getModelTree().asModelSingleThreaded().getRootNode().getDescendants(true).map { it.getName() },
+                "renamedInDraft"
+            )
 
             // cleanup
             repositoriesApi.deleteGitRepository(repositoryId.toString())
