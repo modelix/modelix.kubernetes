@@ -21,14 +21,52 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Execute Gradle build
-        run: ./gradlew build
-
       - name: Install Skaffold
         uses: yokawasa/action-setup-kube-tools@v0.11.2
         with:
-          setup-tools: |
-            skaffold
-          skaffold: 2.15.0
+          kubectl: '1.33.2'
+          helm: '3.18.3'
+          skaffold: '2.16.1'
+
+      - name: Gradle assemble
+        run: ./gradlew assemble
+
+      - name: Kubernetes KinD Cluster
+        id: kind
+        uses: helm/kind-action@v1
+        with:
+          registry: true
+          registry_name: my-registry
+          registry_port: 5001
+          registry_enable_delete: true
+          config: ci/cluster.yaml
+
+      - name: Install ingress controller
+        run: ./ci/install-ingress.sh
+
       - name: Build Images
-        run: skaffold build --filename='skaffold-build.yaml' --push=false --disable-multi-platform-build=true
+        run: skaffold build --filename='skaffold-test.yaml' --default-repo ${{ steps.kind.outputs.LOCAL_REGISTRY }} --push --disable-multi-platform-build=true --file-output=tags.json
+
+      - name: Deploy Cluster
+        run: ./ci/deploy.sh
+
+      - name: Run integration tests
+        run: ./gradlew build -Pmodelix.baseurl="http://localhost:20080"
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@3a74b2957438d0b6e2e61d67b05318aa25c9e6c6 # v2
+        # Also report in case the build failed
+        if: always()
+        with:
+          files: |
+            **/test-results/**/*.xml
+
+      - name: Archive test report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        # Archive test reports for introspection even if the build failed. They are most useful in this situation.
+        if: always()
+        with:
+          name: test-report
+          path: |
+            */build/test-results
+            */build/reports
