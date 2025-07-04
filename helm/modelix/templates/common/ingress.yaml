@@ -1,3 +1,4 @@
+{{ if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -32,7 +33,42 @@ spec:
                 name: "{{ include "modelix.fullname" . }}-keycloak"
                 port:
                   number: 8080
-            path: /(resources|admin|js|realms)/.*
+            path: /resources/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /admin/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /js/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-keycloak"
+                port:
+                  number: 8080
+            path: /realms/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-proxy"
+                port:
+                  number: 80
+            path: /modelix/
+          - pathType: Prefix
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-proxy"
+                port:
+                  number: 80
+            path: /model/v2/
           - pathType: Prefix
             backend:
               service:
@@ -40,4 +76,4 @@ spec:
                 port:
                   number: 4180
             path: /
-
+{{ end }}
