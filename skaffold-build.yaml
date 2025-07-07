@@ -11,3 +11,8 @@ build:
     - image: modelix-keycloak
       docker:
         target: keycloak
+    - image: modelix-workspace-manager
+      jib:
+        project: workspace-manager
+    - image: modelix-workspace-job
+      context: workspace-job

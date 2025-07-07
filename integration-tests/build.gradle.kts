@@ -33,21 +33,3 @@ tasks {
         }
     }
 }
-
-//tasks {
-//    val skaffoldRun by registering(Exec::class) {
-//        executable = "skaffold"
-//        workingDir = rootProject.projectDir
-//        args("run", "--port-forward=user")
-//    }
-//    val skaffoldDelete by registering(Exec::class) {
-//        executable = "skaffold"
-//        workingDir = rootProject.projectDir
-//        args("delete")
-//    }
-//
-//    test {
-//        dependsOn(skaffoldRun)
-//        finalizedBy(skaffoldDelete)
-//    }
-//}

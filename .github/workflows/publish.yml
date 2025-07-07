@@ -17,6 +17,9 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Use tag as version
+        run: echo "${GITHUB_REF#refs/*/}" > version.txt
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
