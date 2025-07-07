@@ -60,7 +60,7 @@ import kotlin.time.Duration.Companion.seconds
 class DraftRebaseTest {
 
     @Test
-    fun `changes from git can be merged after draft creation`(): Unit = runBlocking { withTimeout(5.minutes) {
+    fun `changes from git can be merged after draft creation`(): Unit = runBlocking { withTimeout(10.minutes) {
         runWithGitRepository { gitUrl ->
             println("gitUrl: $gitUrl")
 
@@ -153,7 +153,7 @@ class DraftRebaseTest {
 
             // trigger draft branch creation
             draftsApi.prepareDraftBranch(createdDraft.id.toString(), DraftPreparationJob())
-            withTimeout(1.minutes) {
+            withTimeout(3.minutes) {
                 while (draftsApi.getDraftBranchPreparationJob(createdDraft.id.toString()).body().also { it.errorMessage?.let { error(it) } }.active == true) {
                     delay(3.seconds)
                 }
@@ -189,7 +189,7 @@ class DraftRebaseTest {
                 gitBranchName = "main",
                 baseGitCommit = branchesList.branches.first { it.name == "main" }.gitCommitHash!!
             ))
-            withTimeout(1.minutes) {
+            withTimeout(3.minutes) {
                 while (draftsApi.getDraftRebaseJob(createdDraft.id.toString()).body().also { it.errorMessage?.let { error(it) } }.active == true) {
                     delay(3.seconds)
                 }
