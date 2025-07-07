@@ -5,7 +5,7 @@ set -o xtrace
 
 cd "$(dirname "$0")"
 
-HELM_CHART_VERSION="$(cat ../helm-chart-version.txt)"
+HELM_CHART_VERSION="$(cat ../version.txt)"
 
 sed -i.bak -E "s/^appVersion:.*/appVersion: \"${HELM_CHART_VERSION}\"/" modelix/Chart.yaml
 sed -i.bak -E "s/^version:.*/version: \"${HELM_CHART_VERSION}\"/" modelix/Chart.yaml

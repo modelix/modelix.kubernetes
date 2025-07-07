@@ -45,7 +45,7 @@ jobs:
         run: ./ci/install-ingress.sh
 
       - name: Build Images
-        run: skaffold build --filename='skaffold-test.yaml' --default-repo ${{ steps.kind.outputs.LOCAL_REGISTRY }} --push --disable-multi-platform-build=true --file-output=tags.json
+        run: skaffold build --filename='skaffold-test.yaml' --default-repo ${{ steps.kind.outputs.LOCAL_REGISTRY }} --insecure-registry ${{ steps.kind.outputs.LOCAL_REGISTRY }} --push --disable-multi-platform-build=true --file-output=tags.json
 
       - name: Deploy Cluster
         run: ./ci/deploy.sh

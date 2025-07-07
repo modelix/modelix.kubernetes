@@ -1,43 +1,110 @@
 [versions]
-keycloak="26.3.0"
-kotlin = "2.1.21"
-ktor="3.2.0"
-kotlinx-coroutines = "1.10.2"
-kotlinSerialization="1.8.1"
-modelix-core = "15.4.2"
-modelix-openapi = "1.3.0"
 jetty = "11.0.25"
+jetty9 = "9.4.57.v20241219"
+jgit = "7.3.0.202506031305-r"
+junit = "5.13.3"
+keycloak="26.3.0"
+kotlin = "2.2.0"
+kotlin-logging = "3.0.5"
+kotlinSerialization="1.8.1"
+kotlinx-coroutines = "1.10.2"
+ktor = "3.2.1"
+logback = "1.5.18"
+modelix-core = "15.4.2"
+modelix-mps-plugins = "0.11.1"
+modelix-openapi = "1.3.0"
 
 [libraries]
+auth0-jwt = { group = "com.auth0", name = "java-jwt", version = "4.5.0" }
+commons-codec = { group = "commons-codec", name = "commons-codec", version = "1.18.0" }
+commons-io = { group = "commons-io", name = "commons-io", version = "2.19.0" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.17.0" }
+commons-text = { group = "org.apache.commons", name = "commons-text", version = "1.13.1" }
+jakarta-servlet-api = { group = "jakarta.servlet", name = "jakarta.servlet-api", version = "6.0.0" }
+jasypt = { group = "org.jasypt", name = "jasypt", version = "1.9.3" }
+javax-servlet-api = { group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1" }
+jetty-server = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jetty" }
+jetty-servlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jetty" }
+jetty9-proxy = { group = "org.eclipse.jetty", name = "jetty-proxy", version.ref = "jetty9" }
+jetty9-server = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jetty9" }
+jetty9-servlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jetty9" }
+jetty9-websocket-client = { group = "org.eclipse.jetty.websocket", name = "websocket-client", version.ref = "jetty9" }
+jetty9-websocket-server = { group = "org.eclipse.jetty.websocket", name = "websocket-server", version.ref = "jetty9" }
+jetty9-websocket-servlet = { group = "org.eclipse.jetty.websocket", name = "websocket-servlet", version.ref = "jetty9" }
+jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "jgit" }
+jgit-server = { group = "org.eclipse.jgit", name = "org.eclipse.jgit.http.server", version.ref = "jgit" }
+json = { group = "org.json", name = "json", version = "20250517" }
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.83.0" }
 keycloak-core = { group = "org.keycloak", name = "keycloak-core", version.ref = "keycloak" }
 keycloak-server-spi = { group = "org.keycloak", name = "keycloak-server-spi", version.ref = "keycloak" }
 keycloak-server-spi-private = { group = "org.keycloak", name = "keycloak-server-spi-private", version.ref = "keycloak" }
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
-modelix-dashboard = { group = "org.modelix", name = "dashboard-spa", version = "1.1.0" }
-modelix-model-client = { group = "org.modelix", name = "model-client", version.ref = "modelix-core" }
-modelix-authorization = { group = "org.modelix", name = "authorization", version.ref = "modelix-core" }
-
-jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version = "7.3.0.202506031305-r" }
-jgit-server = { group = "org.eclipse.jgit", name = "org.eclipse.jgit.http.server", version = "7.3.0.202506031305-r" }
-jetty-proxy = { group = "org.eclipse.jetty", name = "jetty-proxy", version.ref = "jetty" }
-jetty-server = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jetty" }
-jetty-servlet = { group = "org.eclipse.jetty", name = "jetty-servlet", version.ref = "jetty" }
-jetty-websocket-client = { group = "org.eclipse.jetty.websocket", name = "websocket-client", version.ref = "jetty" }
-jetty-websocket-server = { group = "org.eclipse.jetty.websocket", name = "websocket-server", version.ref = "jetty" }
-jetty-websocket-servlet = { group = "org.eclipse.jetty.websocket", name = "websocket-servlet", version.ref = "jetty" }
-javax-servlet-api = { group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1" }
-jakarta-servlet-api = { group = "jakarta.servlet", name = "jakarta.servlet-api", version = "6.0.0" }
-
-modelix-api-client-ktor = { group = "org.modelix", name = "api-client-ktor", version.ref = "modelix-openapi" }
+kotlin-logging = { group = "io.github.microutils", name = "kotlin-logging", version.ref = "kotlin-logging" }
+kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinSerialization" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.9.0" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
-kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinSerialization" }
-
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktor" }
+ktor-server-call-logging = { group = "io.ktor", name = "ktor-server-call-logging", version.ref = "ktor" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
+ktor-server-data-conversion = { group = "io.ktor", name = "ktor-server-data-conversion", version.ref = "ktor" }
+ktor-server-html-builder = { group = "io.ktor", name = "ktor-server-html-builder", version.ref = "ktor" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
+ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
+kubernetes-client = { group = "io.kubernetes", name = "client-java", version = "23.0.0" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+maven-invoker = { group = "org.apache.maven.shared", name = "maven-invoker", version = "3.3.0" }
+modelix-api-client-ktor = { group = "org.modelix", name = "api-client-ktor", version.ref = "modelix-openapi" }
+modelix-api-server-stubs = { group = "org.modelix", name = "api-server-stubs-ktor", version.ref = "modelix-openapi" }
+modelix-authorization = { group = "org.modelix", name = "authorization", version.ref = "modelix-core" }
+modelix-dashboard = { group = "org.modelix", name = "dashboard-spa", version = "1.1.0" }
+modelix-model-client = { group = "org.modelix", name = "model-client", version.ref = "modelix-core" }
+modelix-model-server = { group = "org.modelix", name = "model-server", version.ref = "modelix-core" }
+modelix-mps-build-tools = { group = "org.modelix.mps", name="build-tools-lib", version = "1.9.0"}
+modelix-mpsPlugins-diff = { group = "org.modelix.mps", name = "diff-plugin", version.ref = "modelix-mps-plugins" }
+modelix-mpsPlugins-generator = { group = "org.modelix.mps", name = "generator-execution-plugin", version.ref = "modelix-mps-plugins" }
+modelix-syncPlugin3 = { group = "org.modelix.mps", name = "mps-sync-plugin3", version.ref = "modelix-core" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version = "2.0.17" }
+zt-zip = { group = "org.zeroturnaround", name = "zt-zip", version = "1.17" }
+
+[bundles]
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-cio",
+    "ktor-client-auth",
+    "ktor-client-content-negotiation"
+]
+ktor-server = [
+    "ktor-serialization-kotlinx-json",
+    "ktor-server-core",
+    "ktor-server-content-negotiation",
+    "ktor-server-cors",
+    "ktor-server-html-builder",
+    "ktor-server-auth",
+    "ktor-server-status-pages",
+    "ktor-server-netty",
+]
+modelix-mpsPlugins-all = [
+    "modelix-syncPlugin3",
+    "modelix-mpsPlugins-generator",
+    "modelix-mpsPlugins-diff"
+]
 
 [plugins]
 gitVersion = { id = "com.palantir.git-version", version = "4.0.0" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.4.5" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+openapi-generator = {id = "org.openapi.generator", version = "7.12.0"}
+shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }

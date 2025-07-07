@@ -4,7 +4,7 @@
 /helm
 /.gitignore
 /.releaserc.yaml
-/helm-chart-version.txt
+/version.txt
 /package.json
 /package-lock.json
 /README.md
