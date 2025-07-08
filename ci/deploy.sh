@@ -16,9 +16,9 @@ echo "Watching deployment status in namespace '$NAMESPACE' (timeout: $TIMEOUT se
 while kill -0 "$DEPLOY_PID" 2>/dev/null; do
     echo ""
     echo "=== $(date): Deployment Status ==="
-    kubectl get deployments -n "$NAMESPACE" || true
+    kubectl get deployments -n "$NAMESPACE" -o wide || true
     echo "---"
-    kubectl get pods -n "$NAMESPACE" || true
+    kubectl get pods -n "$NAMESPACE" -o wide || true
 
     sleep "$INTERVAL"
     ELAPSED=$((ELAPSED + INTERVAL))
