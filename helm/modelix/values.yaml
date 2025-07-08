@@ -95,31 +95,6 @@ certmanager:
   # kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
   enabled: false
 
-kestra:
-  configuration:
-    kestra:
-      basic-auth:
-        enabled: true
-        username: admin
-        password: secret
-      encryption:
-        secretKey: jhm3E/1WNE9EIiDsPptckrdgD4EsxaeaptnwlQyCDos=
-#    micronaut:
-#      server:
-#        contextPath: "kestra"
-  ingress:
-    enabled: false
-  postgresql:
-    enabled: true
-  dind:
-    enabled: false
-#  readinessProbe:
-#    path: /kestra/health/readiness
-#  livenessProbe:
-#    path: /kestra/health/liveness
-#  startupProbe:
-#    path: /kestra/health
-
 db:
   useGCloud: false
   user: "modelix"

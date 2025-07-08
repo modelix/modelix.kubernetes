@@ -24,6 +24,3 @@ version: "0.0.1"
 appVersion: "0.0.1"
 
 dependencies: []
-#  - name: kestra
-#    repository: https://helm.kestra.io/
-#    version: 0.22.2
