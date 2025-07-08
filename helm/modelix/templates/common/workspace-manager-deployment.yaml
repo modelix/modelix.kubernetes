@@ -32,7 +32,7 @@ spec:
           - name: "KUBERNETES_NAMESPACE"
             value: {{ .Release.Namespace }}
           - name: "WORKSPACE_JOB_IMAGE"
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.job.image.repository }}:{{ .Values.workspaces.job.image.tag }}"
+            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.job.image.repository }}:{{ .Values.workspaces.job.image.tag | default .Chart.Version }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
@@ -79,7 +79,7 @@ spec:
             value: "{{ .Values.dockerProxy.prefix }}{{ .Values.gitImport.image.repository }}:{{ .Values.gitImport.image.tag }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
           {{- include "modelix.commonVariables" . | nindent 10 }}
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.manager.image.repository }}:{{ .Values.workspaces.manager.image.tag }}"
+        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.manager.image.repository }}:{{ .Values.workspaces.manager.image.tag | default .Chart.Version }}"
         imagePullPolicy: {{ .Values.workspaces.manager.image.pullPolicy }}
         name: workspace-manager
         ports:

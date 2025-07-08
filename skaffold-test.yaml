@@ -17,6 +17,10 @@ deploy:
         namespace: modelix-test
         createNamespace: true
         setValueTemplates:
+          workspaces.manager.image.repository: "{{.IMAGE_REPO_modelix_workspace_manager}}"
+          workspaces.manager.image.tag: "{{.IMAGE_TAG_modelix_workspace_manager}}@{{.IMAGE_DIGEST_modelix_workspace_manager}}"
+          workspaces.job.image.repository: "{{.IMAGE_REPO_modelix_workspace_job}}"
+          workspaces.job.image.tag: "{{.IMAGE_TAG_modelix_workspace_job}}@{{.IMAGE_DIGEST_modelix_workspace_job}}"
           proxy.image.repository: "{{.IMAGE_REPO_modelix_proxy}}"
           proxy.image.tag: "{{.IMAGE_TAG_modelix_proxy}}@{{.IMAGE_DIGEST_modelix_proxy}}"
           keycloak.image.repository: "{{.IMAGE_REPO_modelix_keycloak}}"
