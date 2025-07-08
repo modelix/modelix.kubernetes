@@ -64,7 +64,7 @@ workspaces:
     memory: 600Mi
     image:
       repository: modelix/modelix-workspace-manager
-      tag: "0.15.0"
+      tag: "1.0.0"
       pullPolicy: IfNotPresent
   client:
     # Ports as numbers which should be exposed from MPS.
@@ -74,7 +74,7 @@ workspaces:
   job:
     image:
       repository: modelix/modelix-workspace-job
-      tag: "0.15.0"
+      tag: "1.0.0"
       pullPolicy: IfNotPresent
 
 ingress:
