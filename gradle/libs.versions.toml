@@ -20,7 +20,7 @@ commons-codec = { group = "commons-codec", name = "commons-codec", version = "1.
 commons-io = { group = "commons-io", name = "commons-io", version = "2.19.0" }
 commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.17.0" }
 commons-text = { group = "org.apache.commons", name = "commons-text", version = "1.13.1" }
-jakarta-servlet-api = { group = "jakarta.servlet", name = "jakarta.servlet-api", version = "6.0.0" }
+jakarta-servlet-api = { group = "jakarta.servlet", name = "jakarta.servlet-api", version = "6.1.0" }
 jasypt = { group = "org.jasypt", name = "jasypt", version = "1.9.3" }
 javax-servlet-api = { group = "javax.servlet", name = "javax.servlet-api", version = "4.0.1" }
 jetty-server = { group = "org.eclipse.jetty", name = "jetty-server", version.ref = "jetty" }
