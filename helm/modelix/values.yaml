@@ -111,7 +111,7 @@ postgres:
     enabled: false
     image:
       repository: pgautoupgrade/pgautoupgrade
-      tag: 17-alpine@sha256:2274ff18ebc9851d95126315b78c724d4eaa1b497c7623238b9d074c0ce1845e
+      tag: 17-alpine@sha256:cb81a5d4cec28c023f2247efe85ab87db38adc48a393d98a82cb6204ec0dd4e7
       pullPolicy: IfNotPresent
 
 dockerProxy:
