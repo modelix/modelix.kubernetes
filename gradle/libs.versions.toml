@@ -68,7 +68,7 @@ maven-invoker = { group = "org.apache.maven.shared", name = "maven-invoker", ver
 modelix-api-client-ktor = { group = "org.modelix", name = "api-client-ktor", version.ref = "modelix-openapi" }
 modelix-api-server-stubs = { group = "org.modelix", name = "api-server-stubs-ktor", version.ref = "modelix-openapi" }
 modelix-authorization = { group = "org.modelix", name = "authorization", version.ref = "modelix-core" }
-modelix-dashboard = { group = "org.modelix", name = "dashboard-spa", version = "1.1.0" }
+modelix-dashboard = { group = "org.modelix", name = "dashboard-spa", version = "1.1.1" }
 modelix-model-client = { group = "org.modelix", name = "model-client", version.ref = "modelix-core" }
 modelix-model-server = { group = "org.modelix", name = "model-server", version.ref = "modelix-core" }
 modelix-mps-build-tools = { group = "org.modelix.mps", name="build-tools-lib", version = "1.9.0"}
