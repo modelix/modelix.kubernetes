@@ -16,7 +16,7 @@ import java.net.PasswordAuthentication
 import java.net.Proxy
 import java.net.URL
 
-fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> E.applyCredentials(username: String, password: String): E {
+fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> E.applyCredentials(username: String?, password: String): E {
     val cmd = this
     cmd.setCredentialsProvider(UsernamePasswordCredentialsProvider(username, password))
     cmd.setTransportConfigCallback { transport ->
@@ -35,6 +35,15 @@ fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> E.applyCredentials(userna
         })
     }
     return cmd
+}
+
+fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> E.configureHttpProxy(): E {
+    val proxy = System.getenv("MODELIX_HTTP_PROXY") ?: return this
+    // see https://github.com/openjdk/jdk/blob/e783c524c17e1d1a3fff4b6370e222134e66edc8/src/java.base/share/classes/sun/net/spi/DefaultProxySelector.java#L80
+    // and https://github.com/eclipse-jgit/jgit/blob/a762badfcecd3c200bb29b8ad5806546c7db8eaa/org.eclipse.jgit/src/org/eclipse/jgit/transport/TransportHttp.java#L292
+    System.setProperty("http.proxy", proxy)
+    System.setProperty("https.proxy", proxy)
+    return this
 }
 
 /**

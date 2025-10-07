@@ -22,6 +22,7 @@ class GitFetchTask(scope: CoroutineScope, val repo: GitRepositoryConfig) : TaskI
             if (password.isNotEmpty()) {
                 cmd.applyCredentials(username, password)
             }
+            cmd.configureHttpProxy()
 
             val refs = withContext(Dispatchers.IO) {
                 cmd.call()

@@ -1,6 +1,7 @@
 package org.modelix.services.gitconnector
 
 import io.kubernetes.client.openapi.models.V1Container
+import io.kubernetes.client.openapi.models.V1EnvVar
 import io.kubernetes.client.openapi.models.V1Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -71,6 +72,9 @@ class GitImportTaskUsingKubernetesJob(
                         addContainersItem(V1Container().apply {
                             name = "importer"
                             image = System.getenv("GIT_IMPORT_IMAGE")
+                            System.getenv("MODELIX_HTTP_PROXY")?.let {
+                                addEnvItem(V1EnvVar().name("MODELIX_HTTP_PROXY").value(it))
+                            }
                             args = listOf(
                                 "git-import-remote",
                                 remote.url,
