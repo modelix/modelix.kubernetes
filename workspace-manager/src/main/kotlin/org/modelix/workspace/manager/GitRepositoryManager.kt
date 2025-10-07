@@ -17,20 +17,10 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.GitCommand
 import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.errors.RepositoryNotFoundException
-import org.eclipse.jgit.transport.Transport
-import org.eclipse.jgit.transport.TransportHttp
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import org.eclipse.jgit.transport.http.HttpConnection
-import org.eclipse.jgit.transport.http.HttpConnectionFactory
-import org.eclipse.jgit.transport.http.JDKHttpConnection
-import org.eclipse.jgit.transport.http.JDKHttpConnectionFactory
+import org.modelix.services.gitconnector.applyCredentials
+import org.modelix.services.gitconnector.configureHttpProxy
 import org.modelix.workspaces.GitRepository
 import java.io.File
-import java.net.Authenticator
-import java.net.HttpURLConnection
-import java.net.PasswordAuthentication
-import java.net.Proxy
-import java.net.URL
 import java.util.zip.ZipOutputStream
 
 class GitRepositoryManager(val config: GitRepository, val workspaceDirectory: File) {
@@ -45,7 +35,7 @@ class GitRepositoryManager(val config: GitRepository, val workspaceDirectory: Fi
         val existed = repoDirectory.exists()
         val git = openRepo()
         if (existed) {
-            applyCredentials(git.fetch()).call()
+            git.fetch().applyCredentials().configureHttpProxy().call()
             git.checkout().setName(config.commitHash ?: ("origin/" + config.branch)).call()
 //            if (config.commitHash == null) {
 //                applyCredentials(git.pull()).call()
@@ -66,51 +56,18 @@ class GitRepositoryManager(val config: GitRepository, val workspaceDirectory: Fi
         }
     }
 
-    private fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> applyCredentials(cmd: E): E {
+    private fun <C : GitCommand<T>, T, E : TransportCommand<C, T>> E.applyCredentials(): E {
         val credentials = config.credentials
         if (credentials != null) {
-            cmd.setCredentialsProvider(UsernamePasswordCredentialsProvider(credentials.user, credentials.password))
-            cmd.setTransportConfigCallback { transport ->
-                transport?.setAuthenticator(object : Authenticator() {
-                    override fun getPasswordAuthentication(): PasswordAuthentication {
-                        return PasswordAuthentication(credentials.user, credentials.password.toCharArray())
-                    }
-                })
-            }
+            applyCredentials(credentials.user, credentials.password)
         }
-        return cmd
-    }
-
-    /**
-     * The credentialsProvider only works with WWW-Authenticate: Basic, but not with WWW-Authenticate: Negotiate.
-     * This is handled by the JDK.
-     */
-    private fun Transport.setAuthenticator(authenticator: Authenticator) {
-        val transport = this as TransportHttp
-        val originalFactory = transport.httpConnectionFactory as JDKHttpConnectionFactory
-        transport.httpConnectionFactory = object : HttpConnectionFactory {
-            override fun create(url: URL?): HttpConnection {
-                return modify(originalFactory.create(url))
-            }
-
-            override fun create(url: URL?, proxy: Proxy?): HttpConnection {
-                return modify(originalFactory.create(url, proxy))
-            }
-
-            fun modify(conn: HttpConnection): HttpConnection {
-                val jdkConn = conn as JDKHttpConnection
-                val field = jdkConn.javaClass.getDeclaredField("wrappedUrlConnection")
-                field.isAccessible = true
-                val wrapped = field.get(jdkConn) as HttpURLConnection
-                wrapped.setAuthenticator(authenticator)
-                return conn
-            }
-        }
+        return this
     }
 
     private fun cloneRepo(): Git {
         val cmd = Git.cloneRepository()
-        applyCredentials(cmd)
+        cmd.applyCredentials()
+        cmd.configureHttpProxy()
         cmd.setURI(config.url)
         cmd.setBranch(config.branch)
         val directory = repoDirectory
