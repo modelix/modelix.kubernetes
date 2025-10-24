@@ -27,6 +27,7 @@ class GitConnectorManager(
 ) {
 
     private val importTasks = ReusableTasks<GitImportTask.Key, GitImportTask>()
+    val exportTasks = ReusableTasks<GitExportTask.Key, GitExportTask>()
     val draftPreparationTasks = ReusableTasks<DraftPreparationTask.Key, DraftPreparationTask>()
     private val draftRebaseTasks = ReusableTasks<DraftRebaseTask.Key, DraftRebaseTask>()
 
@@ -55,6 +56,32 @@ class GitConnectorManager(
     fun getOrCreateImportTask(taskKey: GitImportTask.Key): GitImportTask {
         return importTasks.getOrCreateTask(taskKey) {
             GitImportTaskUsingKubernetesJob(
+                key = taskKey,
+                scope = scope,
+                modelClient = modelClient,
+                jwtUtil = kestraClient.jwtUtil,
+            )
+        }
+    }
+
+    suspend fun getOrCreateExportTask(draftId: String): GitExportTask {
+        val data = connectorData.getValue()
+        val draft = requireNotNull(data.drafts[draftId]) { "Draft not found: $draftId" }
+        val gitRepoConfig = requireNotNull(data.repositories[draft.gitRepositoryId]) { "Repository not found: ${draft.gitRepositoryId}" }
+        val modelixBranch = gitRepoConfig.getModelixRepositoryId().getBranchReference(draft.modelixBranchName)
+        val versionHash = modelClient.pullHash(modelixBranch)
+        val key = GitExportTask.Key(
+            repo = gitRepoConfig,
+            modelixVersionHash = versionHash,
+            modelixBranchName = draft.modelixBranchName,
+            gitBaseBranch = draft.gitBranchName,
+        )
+        return getOrCreateExportTask(key)
+    }
+
+    fun getOrCreateExportTask(taskKey: GitExportTask.Key): GitExportTask {
+        return exportTasks.getOrCreateTask(taskKey) {
+            GitExportTask(
                 key = taskKey,
                 scope = scope,
                 modelClient = modelClient,
