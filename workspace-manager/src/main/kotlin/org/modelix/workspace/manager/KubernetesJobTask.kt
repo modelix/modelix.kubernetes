@@ -14,19 +14,35 @@ import org.modelix.services.workspaces.spec
 import org.modelix.services.workspaces.template
 import org.modelix.workspace.manager.WorkspaceJobQueue.Companion.KUBERNETES_NAMESPACE
 import kotlin.coroutines.suspendCoroutine
+import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 abstract class KubernetesJobTask<Out : Any>(scope: CoroutineScope) : TaskInstance<Out>(scope) {
     companion object {
         const val JOB_ID_LABEL = "modelix.workspace.job.id"
         private val LOG = mu.KotlinLogging.logger {}
     }
 
+    private var lastResultCheck: Instant = Instant.fromEpochSeconds(0L)
+
     abstract suspend fun tryGetResult(): Out?
     abstract fun generateJobYaml(): V1Job
+    open fun getResultCheckingInterval(): Duration = 5.seconds
+
+    suspend fun checkForResult(): Out? {
+        val now = Clock.System.now()
+        if (now - lastResultCheck < getResultCheckingInterval()) return null
+        lastResultCheck = Clock.System.now()
+        return tryGetResult()
+    }
 
     override suspend fun process() = withTimeout(30.minutes) {
-        tryGetResult()?.let { return@withTimeout it }
+        checkForResult()?.let { return@withTimeout it }
 
         findJob()?.let { deleteJob(it) }
         createJob()
@@ -35,7 +51,7 @@ abstract class KubernetesJobTask<Out : Any>(scope: CoroutineScope) : TaskInstanc
         while (true) {
             delay(1000)
 
-            tryGetResult()?.let { return@withTimeout it }
+            checkForResult()?.let { return@withTimeout it }
 
             val job = findJob()
 

@@ -42,9 +42,9 @@ class GitImportTaskUsingKubernetesJob(
 
     override suspend fun tryGetResult(): IVersion? {
         return if (modelixBranchExists()) {
-            return modelClient.lazyLoadVersion(branchRef).takeIf { it.gitCommit == key.gitRevision }
+            modelClient.lazyLoadVersion(branchRef).takeIf { it.gitCommit == key.gitRevision }
         } else {
-            return null
+            null
         }
     }
 

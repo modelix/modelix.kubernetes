@@ -8,6 +8,8 @@ import io.ktor.server.routing.Route
 import kotlinx.serialization.Serializable
 import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsController
 import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsController.Companion.modelixGitConnectorDraftsRoutes
+import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsExportJobController
+import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsExportJobController.Companion.modelixGitConnectorDraftsExportJobRoutes
 import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsPreparationJobController
 import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsPreparationJobController.Companion.modelixGitConnectorDraftsPreparationJobRoutes
 import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorDraftsRebaseJobController
@@ -25,6 +27,7 @@ import org.modelix.services.gitconnector.stubs.controllers.ModelixGitConnectorRe
 import org.modelix.services.gitconnector.stubs.controllers.TypedApplicationCall
 import org.modelix.services.gitconnector.stubs.models.DraftConfig
 import org.modelix.services.gitconnector.stubs.models.DraftConfigList
+import org.modelix.services.gitconnector.stubs.models.DraftExportJob
 import org.modelix.services.gitconnector.stubs.models.DraftPreparationJob
 import org.modelix.services.gitconnector.stubs.models.DraftRebaseJob
 import org.modelix.services.gitconnector.stubs.models.GitBranchList
@@ -301,6 +304,43 @@ class GitConnectorController(val manager: GitConnectorManager) {
                 call: TypedApplicationCall<DraftPreparationJob>,
             ) {
                 val task = manager.getOrCreateDraftPreparationTask(draftId).also { it.launch() }
+                call.respondJob(task)
+            }
+        })
+
+        modelixGitConnectorDraftsExportJobRoutes(object : ModelixGitConnectorDraftsExportJobController {
+            suspend fun TypedApplicationCall<DraftExportJob>.respondJob(task: GitExportTask) {
+                respondTyped(
+                    DraftExportJob(
+                        active = when (task.getState()) {
+                            TaskState.CREATED, TaskState.ACTIVE -> true
+                            TaskState.CANCELLED, TaskState.COMPLETED, TaskState.UNKNOWN -> false
+                        },
+                        errorMessage = task.getOutput()?.exceptionOrNull()?.stackTraceToString(),
+                        gitBranchName = task.gitBranchName,
+                        modelixVersionHash = task.key.modelixVersionHash,
+                    ),
+                )
+            }
+
+            override suspend fun getDraftExportJob(
+                draftId: String,
+                call: TypedApplicationCall<DraftExportJob>,
+            ) {
+                val draft = manager.getDraft(draftId)
+                    ?: return call.respondText("Draft not found: $draftId", status = HttpStatusCode.NotFound)
+                val task = manager.exportTasks.getAll().lastOrNull { it.key.modelixBranchName == draft.modelixBranchName }
+                    ?: return call.respondText("No export job found for draft $draftId", status = HttpStatusCode.NotFound)
+                call.respondJob(task)
+            }
+
+            override suspend fun exportDraft(
+                draftId: String,
+                draftExportJob: DraftExportJob,
+                call: TypedApplicationCall<DraftExportJob>,
+            ) {
+                val task = manager.getOrCreateExportTask(draftId)
+                task.launch()
                 call.respondJob(task)
             }
         })
