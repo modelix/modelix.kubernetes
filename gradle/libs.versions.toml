@@ -17,7 +17,7 @@ modelix-openapi = "1.4.0"
 [libraries]
 auth0-jwt = { group = "com.auth0", name = "java-jwt", version = "4.5.0" }
 commons-codec = { group = "commons-codec", name = "commons-codec", version = "1.19.0" }
-commons-io = { group = "commons-io", name = "commons-io", version = "2.20.0" }
+commons-io = { group = "commons-io", name = "commons-io", version = "2.21.0" }
 commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.19.0" }
 commons-text = { group = "org.apache.commons", name = "commons-text", version = "1.14.0" }
 jakarta-servlet-api = { group = "jakarta.servlet", name = "jakarta.servlet-api", version = "6.1.0" }
