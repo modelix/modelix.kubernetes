@@ -103,7 +103,7 @@ modelix-mpsPlugins-all = [
 
 [plugins]
 gitVersion = { id = "com.palantir.git-version", version = "4.1.0" }
-jib = { id = "com.google.cloud.tools.jib", version = "3.4.5" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.5.1" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 openapi-generator = {id = "org.openapi.generator", version = "7.17.0"}
