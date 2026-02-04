@@ -1,4 +1,4 @@
-FROM gradle:8.14.3-jdk17 AS builder
+FROM gradle:9.3.1-jdk17 AS builder
 
 COPY ./ /project
 RUN cd /project && gradle :keycloak-extensions:assemble
