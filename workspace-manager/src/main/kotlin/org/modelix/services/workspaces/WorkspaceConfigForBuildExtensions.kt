@@ -26,8 +26,8 @@ fun WorkspaceInstance.configForBuild(gitManager: GitConnectorManager) = Workspac
     mavenRepositories = config.mavenRepositories.orEmpty().map {
         MavenRepositoryForBuild(
             url = it.url,
-            username = null,
-            password = null,
+            username = it.credentials?.username,
+            password = it.credentials?.password,
         )
     }.toSet(),
     mavenArtifacts = config.mavenArtifacts.orEmpty().map { "${it.groupId}:${it.artifactId}:${it.version ?: "*"}" }.toSet(),
