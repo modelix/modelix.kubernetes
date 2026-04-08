@@ -5,7 +5,7 @@ fullnameOverride: ""
 dockerRegistry:
   image:
     repository: registry
-    tag: 3.0.0@sha256:61349442e9c3dc07fd06ffa6a4b622bc28960952b6b3adafcb58fa268ce92e70
+    tag: 3.1.0@sha256:afcd13fd045b8859ac4f60fef26fc2d2f9b7b9d9e604c3c4f7c2fb1b94f95a64
     pullPolicy: IfNotPresent
 
 oauthProxy:
