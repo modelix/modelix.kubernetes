@@ -25,7 +25,7 @@ class WorkspaceClientStartupActivity : StartupActivity {
             println("branch: $branchName")
             println("JWT: $jwt")
             if (modelUri != null && repoId != null) {
-                val connection = IModelSyncService.getInstance(project).addServer(modelUri, repositoryId = repoId)
+                val connection = IModelSyncService.getInstance(project).addServer(modelUri)
                 if (jwt != null) {
                     connection.setTokenProvider { jwt }
                 }
