@@ -60,7 +60,7 @@ jobs:
         run: ./gradlew build -Pmodelix.baseurl="http://localhost:20080"
 
       - name: Publish test results
-        uses: EnricoMi/publish-unit-test-result-action@3a74b2957438d0b6e2e61d67b05318aa25c9e6c6 # v2
+        uses: EnricoMi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
         # Also report in case the build failed
         if: always()
         with:
