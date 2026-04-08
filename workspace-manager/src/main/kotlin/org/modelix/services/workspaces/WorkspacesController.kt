@@ -23,6 +23,7 @@ import org.modelix.services.workspaces.stubs.controllers.ModelixWorkspacesTasksC
 import org.modelix.services.workspaces.stubs.controllers.ModelixWorkspacesWorkspacesController
 import org.modelix.services.workspaces.stubs.controllers.ModelixWorkspacesWorkspacesController.Companion.modelixWorkspacesWorkspacesRoutes
 import org.modelix.services.workspaces.stubs.controllers.TypedApplicationCall
+import org.modelix.services.workspaces.stubs.models.MavenRepository
 import org.modelix.services.workspaces.stubs.models.WorkspaceConfig
 import org.modelix.services.workspaces.stubs.models.WorkspaceInstance
 import org.modelix.services.workspaces.stubs.models.WorkspaceInstanceEnabled
@@ -64,12 +65,12 @@ class WorkspacesController(
                 if (workspace == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {
-                    call.respondTyped(workspace)
+                    call.respondTyped(workspace.maskCredentials())
                 }
             }
 
             override suspend fun listWorkspaces(call: TypedApplicationCall<WorkspaceList>) {
-                call.respondTyped(WorkspaceList(workspaces = manager.getAllWorkspaces()))
+                call.respondTyped(WorkspaceList(workspaces = manager.getAllWorkspaces()).maskCredentials())
             }
 
             override suspend fun deleteWorkspace(
@@ -108,7 +109,7 @@ class WorkspacesController(
                 )
                 manager.putWorkspace(newWorkspace)
                 call.getUserName()?.let { manager.assignOwner(newWorkspace.id, it) }
-                call.respondTyped(newWorkspace)
+                call.respondTyped(newWorkspace.maskCredentials())
             }
         })
 
@@ -356,3 +357,7 @@ class WorkspacesController(
         }
     }
 }
+
+fun WorkspaceList.maskCredentials() = copy(workspaces = workspaces.map { it.maskCredentials() })
+fun WorkspaceConfig.maskCredentials() = copy(mavenRepositories = mavenRepositories?.map { it.maskCredentials() })
+fun MavenRepository.maskCredentials() = copy(credentials = null)
