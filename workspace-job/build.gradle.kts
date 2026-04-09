@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.jgit)
     implementation(libs.maven.invoker)
     implementation(libs.zt.zip)
+    implementation(libs.commons.text)
 
     implementation(project(":workspaces"))
     implementation(libs.modelix.mps.build.tools)
