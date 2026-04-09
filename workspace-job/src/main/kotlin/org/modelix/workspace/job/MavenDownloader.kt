@@ -75,9 +75,11 @@ class MavenDownloader(val workspace: WorkspaceConfigForBuild, val workspaceDir: 
                 ${
                 workspace.mavenRepositories.flatMapIndexed { index, repo ->
                     listOfNotNull(
+                        "<server>",
                         "<id>repo$index</id>",
                         repo.username?.let { "<username>${StringEscapeUtils.escapeXml11(it)}</username>" },
                         repo.password?.let { "<password>${StringEscapeUtils.escapeXml11(it)}</password>" },
+                        "</server>"
                     )
                 }.joinToString("")
             }
