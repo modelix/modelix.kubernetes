@@ -87,7 +87,7 @@ class WorkspacesController(
                 call: ApplicationCall,
             ) {
                 manager.updateWorkspace(workspaceId) { oldConfig ->
-                    workspaceConfig.copy(id = workspaceId)
+                    workspaceConfig.copy(id = workspaceId).mergeCredentials(oldConfig)
                 }
                 call.respond(HttpStatusCode.OK)
             }
@@ -361,3 +361,20 @@ class WorkspacesController(
 fun WorkspaceList.maskCredentials() = copy(workspaces = workspaces.map { it.maskCredentials() })
 fun WorkspaceConfig.maskCredentials() = copy(mavenRepositories = mavenRepositories?.map { it.maskCredentials() })
 fun MavenRepository.maskCredentials() = copy(credentials = null)
+
+fun WorkspaceConfig.mergeCredentials(oldData: WorkspaceConfig): WorkspaceConfig {
+    val newRepos = mavenRepositories.orEmpty().associateBy { it.url }
+    val oldRepos = oldData.mavenRepositories.orEmpty().associateBy { it.url }
+    val mergedRepos = newRepos.entries.map {
+        it.value.mergeCredentials(oldRepos[it.key])
+    }
+    return copy(mavenRepositories = mergedRepos)
+}
+fun MavenRepository.mergeCredentials(oldData: MavenRepository?): MavenRepository {
+    if (oldData == null) return this
+    val newCredentials = (credentials ?: oldData.credentials).takeIf { hasCredentials != false }
+    return copy(
+        hasCredentials = newCredentials != null,
+        credentials = newCredentials,
+    )
+}
