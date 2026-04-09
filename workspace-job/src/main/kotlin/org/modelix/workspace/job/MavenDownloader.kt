@@ -14,6 +14,7 @@
 package org.modelix.workspace.job
 
 import org.apache.commons.io.FileUtils
+import org.apache.commons.text.StringEscapeUtils
 import org.apache.maven.shared.invoker.DefaultInvocationRequest
 import org.apache.maven.shared.invoker.DefaultInvoker
 import org.apache.maven.shared.invoker.InvocationOutputHandler
@@ -60,10 +61,31 @@ class MavenDownloader(val workspace: WorkspaceConfigForBuild, val workspaceDir: 
         request.goals = listOf("dependency:get")
         request.isBatchMode = true
         val properties = Properties()
-        properties["remoteRepositories"] = workspace.mavenRepositories.joinToString(",") { it.url }
+        properties["remoteRepositories"] = workspace.mavenRepositories
+            .mapIndexed { index, repo -> "repo$index::default::${repo.url}" }
+            .joinToString(",")
         properties["transitive"] = "false"
         properties["artifact"] = addPackagingIfMissing(coordinates)
         request.properties = properties
+        val settingsFile = File.createTempFile("settings", ".xml")
+        settingsFile.writeText(
+            """
+            <settings>
+              <servers>
+                ${
+                workspace.mavenRepositories.flatMapIndexed { index, repo ->
+                    listOfNotNull(
+                        "<id>repo$index</id>",
+                        repo.username?.let { "<username>${StringEscapeUtils.escapeXml11(it)}</username>" },
+                        repo.password?.let { "<password>${StringEscapeUtils.escapeXml11(it)}</password>" },
+                    )
+                }.joinToString("")
+            }
+              </servers>
+            </settings>
+        """,
+        )
+        request.userSettingsFile = settingsFile
 
         invokeMaven(request, outputHandler?.let { { outputHandler(it) } })
     }
