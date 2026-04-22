@@ -3,7 +3,7 @@ FROM gradle:8.14.4-jdk17@sha256:cd90533c9f7a5f28225af3076d58ea5ef569bfbc7eea4ae3
 COPY ./ /project
 RUN cd /project && gradle :keycloak-extensions:assemble
 
-FROM quay.io/keycloak/keycloak:26.6.0@sha256:b0e5dbced1775de4d629f103c0a9cfc057decc62ce8d3cb1c54f8849a6c6eb62 AS keycloak
+FROM quay.io/keycloak/keycloak:26.6.1@sha256:26ae26445475f7fac5f90ee138b1bdb64324f5815fb16133ffdbdb122d97c4d8 AS keycloak
 
 WORKDIR /opt/keycloak
 COPY --from=builder /project/keycloak-extensions/build/libs/keycloak-extensions.jar /opt/keycloak/providers/org.modelix.keycloak.extensions.jar
