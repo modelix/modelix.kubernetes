@@ -105,7 +105,7 @@ db:
 postgres:
   image:
     repository: postgres
-    tag: 17.6@sha256:5250e6187084ddf4ba407027d07eed2419d4656e30821afef43825c6c0d127df
+    tag: 18.3@sha256:69e8582b781cb44fa4557b98ed586fe68361e320d9b12f9707494335634f4f3d
     pullPolicy: IfNotPresent
   autoupgrade:
     enabled: false
