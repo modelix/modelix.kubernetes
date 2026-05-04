@@ -10,7 +10,7 @@ kotlinSerialization="1.11.0"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.4.3"
 logback = "1.5.32"
-modelix-core = "18.6.1"
+modelix-core = "18.7.0"
 modelix-mps-plugins = "0.12.0"
 modelix-openapi = "1.6.0"
 
