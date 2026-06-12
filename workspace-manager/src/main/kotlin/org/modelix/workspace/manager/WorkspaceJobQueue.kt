@@ -99,13 +99,13 @@ class WorkspaceJobQueue(val tokenGenerator: (WorkspaceConfig) -> String) {
         val expectedJobs: Map<String, Job> = synchronized(workspaceConfig2job) {
             workspaceConfig2job.values.associateBy { it.kubernetesJobName }
         }
-        val existingJobs: Map<String?, V1Job> = BatchV1Api()
+        val existingJobs: Map<String, V1Job> = BatchV1Api()
             .listNamespacedJob(KUBERNETES_NAMESPACE)
             .execute()
             .items.filter { it.metadata?.name?.startsWith(JOB_PREFIX) == true }
-            .associateBy { it.metadata?.name }
+            .associateBy { it.metadata!!.name!! }
 
-        val unexpected: Map<String?, V1Job> = existingJobs - expectedJobs.keys
+        val unexpected: Map<String, V1Job> = existingJobs - expectedJobs.keys
         for (toRemove in unexpected) {
             expectedJobs[toRemove.key]?.updateLog()
             BatchV1Api().deleteNamespacedJob(toRemove.key, KUBERNETES_NAMESPACE).execute()
@@ -134,11 +134,11 @@ class WorkspaceJobQueue(val tokenGenerator: (WorkspaceConfig) -> String) {
         try {
             val coreApi = CoreV1Api()
             val pods = coreApi.listNamespacedPod(KUBERNETES_NAMESPACE).execute()
-            val matchingPods = pods.items.filter { it.metadata!!.name!!.startsWith(podNamePrefix) }
+            val matchingPods = pods.items.filter { it.metadata?.name?.startsWith(podNamePrefix) == true }
             if (matchingPods.isEmpty()) return null
             return matchingPods.joinToString("\n----------------------------------------------------------------------------\n") { pod ->
                 try {
-                    coreApi.readNamespacedPodLog(pod.metadata!!.name, KUBERNETES_NAMESPACE)
+                    coreApi.readNamespacedPodLog(pod.metadata!!.name!!, KUBERNETES_NAMESPACE)
                         .container(pod.spec!!.containers[0].name)
                         .pretty("true")
                         .tailLines(10_000)

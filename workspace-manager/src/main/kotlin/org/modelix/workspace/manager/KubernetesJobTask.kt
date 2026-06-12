@@ -81,7 +81,7 @@ abstract class KubernetesJobTask<Out : Any>(scope: CoroutineScope) : TaskInstanc
             for (pod in pods.items) {
                 if (pod.metadata!!.labels?.get(JOB_ID_LABEL) != id.toString()) continue
                 return coreApi
-                    .readNamespacedPodLog(pod.metadata!!.name, KUBERNETES_NAMESPACE)
+                    .readNamespacedPodLog(pod.metadata!!.name!!, KUBERNETES_NAMESPACE)
                     .container(pod.spec!!.containers[0].name)
                     .pretty("true")
                     .tailLines(10_000)
@@ -133,12 +133,12 @@ abstract class KubernetesJobTask<Out : Any>(scope: CoroutineScope) : TaskInstanc
             BatchV1Api().listNamespacedJob(KUBERNETES_NAMESPACE)
                 .executeAsync(ContinuingCallback(it))
         }
-        return jobs.items.firstOrNull { it.metadata.labels?.get(JOB_ID_LABEL) == id.toString() }
+        return jobs.items.firstOrNull { it?.metadata?.labels?.get(JOB_ID_LABEL) == id.toString() }
     }
 
     private suspend fun deleteJob(job: V1Job) {
         suspendCoroutine {
-            BatchV1Api().deleteNamespacedJob(job.metadata!!.name, job.metadata!!.namespace)
+            BatchV1Api().deleteNamespacedJob(job.metadata!!.name!!, job.metadata!!.namespace!!)
                 .executeAsync(ContinuingCallback(it))
         }
     }
