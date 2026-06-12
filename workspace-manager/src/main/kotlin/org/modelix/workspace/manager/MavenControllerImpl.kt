@@ -54,9 +54,13 @@ class MavenControllerImpl :
 
     override suspend fun updateMavenRepository(
         repositoryId: String,
-        mavenRepository: MavenRepository,
+        mavenRepository: MavenRepository?,
         call: ApplicationCall,
     ) {
+        if (mavenRepository == null) {
+            call.respond(HttpStatusCode.BadRequest, "No maven repository config provided")
+            return
+        }
         data = data.copy(
             repositories = data.repositories.associateBy { it.id }
                 .plus(repositoryId to mavenRepository.copy(id = repositoryId))
@@ -102,7 +106,7 @@ class MavenControllerImpl :
     override suspend fun updateMavenArtifact(
         groupId: String,
         artifactId: String,
-        mavenArtifact: MavenArtifact,
+        mavenArtifact: MavenArtifact?,
         call: ApplicationCall,
     ) {
         TODO("Not yet implemented")

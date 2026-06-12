@@ -83,9 +83,13 @@ class WorkspacesController(
 
             override suspend fun updateWorkspace(
                 workspaceId: String,
-                workspaceConfig: WorkspaceConfig,
+                workspaceConfig: WorkspaceConfig?,
                 call: ApplicationCall,
             ) {
+                if (workspaceConfig == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No workspace config provided")
+                    return
+                }
                 manager.updateWorkspace(workspaceId) { oldConfig ->
                     workspaceConfig.copy(id = workspaceId).mergeCredentials(oldConfig)
                 }
@@ -93,13 +97,21 @@ class WorkspacesController(
             }
 
             override suspend fun createWorkspace(
-                workspaceConfig: WorkspaceConfig,
+                workspaceConfig: WorkspaceConfig?,
                 call: TypedApplicationCall<WorkspaceConfig>,
             ) {
-                val newWorkspace = workspaceConfig.copy(
-                    id = UUID.randomUUID().toString(),
-                    mpsVersion = workspaceConfig.mpsVersion.takeIf { it.isNotEmpty() } ?: DEFAULT_MPS_VERSION,
-                    memoryLimit = workspaceConfig.memoryLimit?.takeIf { it.isNotEmpty() }?.let {
+                val id = UUID.randomUUID().toString()
+                val newWorkspace = (
+                    workspaceConfig ?: WorkspaceConfig(
+                        id = "",
+                        name = "",
+                        mpsVersion = "",
+                        memoryLimit = "",
+                    )
+                    ).copy(
+                    id = id,
+                    mpsVersion = workspaceConfig?.mpsVersion?.takeIf { it.isNotEmpty() } ?: DEFAULT_MPS_VERSION,
+                    memoryLimit = workspaceConfig?.memoryLimit?.takeIf { it.isNotEmpty() }?.let {
                         runCatching {
                             Quantity(
                                 it,
@@ -147,9 +159,13 @@ class WorkspacesController(
             }
 
             override suspend fun createInstance(
-                workspaceInstance: WorkspaceInstance,
+                workspaceInstance: WorkspaceInstance?,
                 call: TypedApplicationCall<WorkspaceInstance>,
             ) {
+                if (workspaceInstance == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No workspace instance config provided")
+                    return
+                }
                 var readonly = workspaceInstance.readonly ?: false
                 if (readonly == false) {
                     val token = call.principal<JWTPrincipal>()?.payload
@@ -190,11 +206,11 @@ class WorkspacesController(
         modelixWorkspacesInstancesEnabledRoutes(object : ModelixWorkspacesInstancesEnabledController {
             override suspend fun enableInstance(
                 instanceId: String,
-                workspaceInstanceEnabled: WorkspaceInstanceEnabled,
+                workspaceInstanceEnabled: WorkspaceInstanceEnabled?,
                 call: ApplicationCall,
             ) {
                 instancesManager.updateInstancesMap { instances ->
-                    instances.plus(instanceId to instances.getValue(instanceId).copy(enabled = workspaceInstanceEnabled.enabled))
+                    instances.plus(instanceId to instances.getValue(instanceId).copy(enabled = workspaceInstanceEnabled?.enabled ?: true))
                 }
                 call.respond(HttpStatusCode.OK)
             }
@@ -232,7 +248,7 @@ class WorkspacesController(
         modelixWorkspacesInstancesStateRoutes(object : ModelixWorkspacesInstancesStateController {
             override suspend fun changeInstanceState(
                 instanceId: String,
-                workspaceInstanceStateObject: WorkspaceInstanceStateObject,
+                workspaceInstanceStateObject: WorkspaceInstanceStateObject?,
                 call: TypedApplicationCall<WorkspaceInstanceStateObject>,
             ) {
                 TODO("Not yet implemented")
