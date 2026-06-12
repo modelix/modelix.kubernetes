@@ -215,7 +215,7 @@ class WorkspaceInstancesManager(
         val toAdd = expectedInstances - existingInstances.keys
         val toRemove = existingInstances - expectedInstances.keys
         for (deployment in toRemove.values) {
-            val name = deployment.metadata.name
+            val name = deployment.metadata!!.name!!
             try {
                 appsApi.deleteNamespacedDeployment(name, KUBERNETES_NAMESPACE)
                     .execute()
@@ -300,7 +300,7 @@ class WorkspaceInstancesManager(
             for (pod in pods.items) {
                 if (pod.metadata!!.labels?.get(INSTANCE_ID_LABEL) != instanceId) continue
                 return coreApi
-                    .readNamespacedPodLog(pod.metadata!!.name, KUBERNETES_NAMESPACE)
+                    .readNamespacedPodLog(pod.metadata!!.name!!, KUBERNETES_NAMESPACE)
                     .container(pod.spec!!.containers[0].name)
                     .pretty("true")
                     .tailLines(10_000)
@@ -349,7 +349,7 @@ class WorkspaceInstancesManager(
             .timeoutSeconds(TIMEOUT_SECONDS)
             .executeSuspending()
             .items
-            .firstOrNull { it.metadata.labels?.get(INSTANCE_ID_LABEL) == workspaceInstance.id }
+            .firstOrNull { it.metadata?.labels?.get(INSTANCE_ID_LABEL) == workspaceInstance.id }
 
         if (existingDeployment != null) return existingDeployment
 
@@ -398,7 +398,7 @@ class WorkspaceInstancesManager(
             .timeoutSeconds(TIMEOUT_SECONDS)
             .executeSuspending()
             .items
-            .firstOrNull { it.metadata.labels?.get(INSTANCE_ID_LABEL) == workspaceInstance.id }
+            .firstOrNull { it.metadata?.labels?.get(INSTANCE_ID_LABEL) == workspaceInstance.id }
         if (existingService != null) return existingService
 
         val service = Yaml.loadAs(File("/workspace-client-templates/service"), V1Service::class.java)
