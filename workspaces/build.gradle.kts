@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(11) // must be compatible to workspace-job
+    jvmToolchain(17) // must be compatible to workspace-job
 }
 
 dependencies {
