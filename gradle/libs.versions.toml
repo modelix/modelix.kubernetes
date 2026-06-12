@@ -12,7 +12,7 @@ ktor = "3.5.0"
 logback = "1.5.34"
 modelix-core = "18.7.0"
 modelix-mps-plugins = "0.12.0"
-modelix-openapi = "1.6.0"
+modelix-openapi = "1.6.1"
 
 [libraries]
 auth0-jwt = { group = "com.auth0", name = "java-jwt", version = "4.5.2" }

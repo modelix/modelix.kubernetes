@@ -67,11 +67,11 @@ class GitConnectorController(val manager: GitConnectorManager) {
             }
 
             override suspend fun createGitRepository(
-                gitRepositoryConfig: GitRepositoryConfig,
+                gitRepositoryConfig: GitRepositoryConfig?,
                 call: TypedApplicationCall<GitRepositoryConfig>,
             ) {
                 val newId = UUID.randomUUID().toString()
-                val newRepository = gitRepositoryConfig.copy(
+                val newRepository = (gitRepositoryConfig ?: GitRepositoryConfig(newId)).copy(
                     id = newId,
                     status = null,
                     modelixRepository = newId,
@@ -101,11 +101,11 @@ class GitConnectorController(val manager: GitConnectorManager) {
 
             override suspend fun updateGitRepository(
                 repositoryId: String,
-                gitRepositoryConfig: GitRepositoryConfig,
+                gitRepositoryConfig: GitRepositoryConfig?,
                 call: ApplicationCall,
             ) {
                 data.update {
-                    val mergedConfig = it.repositories[repositoryId].merge(gitRepositoryConfig)
+                    val mergedConfig = it.repositories[repositoryId].merge(gitRepositoryConfig ?: GitRepositoryConfig(repositoryId))
                     it.copy(
                         repositories = it.repositories + (repositoryId to mergedConfig),
                     )
@@ -142,9 +142,13 @@ class GitConnectorController(val manager: GitConnectorManager) {
 
             override suspend fun createDraftInRepository(
                 repositoryId: String,
-                draftConfig: DraftConfig,
+                draftConfig: DraftConfig?,
                 call: TypedApplicationCall<DraftConfig>,
             ) {
+                if (draftConfig == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No draft config provided")
+                    return
+                }
                 val draftId = UUID.randomUUID().toString()
                 val branch = manager.getRepository(repositoryId)?.status?.branches?.find { it.name == draftConfig.gitBranchName }
                 val newDraft = draftConfig.copy(
@@ -255,9 +259,13 @@ class GitConnectorController(val manager: GitConnectorManager) {
 
             override suspend fun rebaseDraft(
                 draftId: String,
-                draftRebaseJob: DraftRebaseJob,
+                draftRebaseJob: DraftRebaseJob?,
                 call: ApplicationCall,
             ) {
+                if (draftRebaseJob == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No job config provided")
+                    return
+                }
                 val draft = data.getValue().drafts[draftId]
                 if (draft == null) {
                     call.respondText("Draft not found: $draftId", status = HttpStatusCode.NotFound)
@@ -300,7 +308,7 @@ class GitConnectorController(val manager: GitConnectorManager) {
 
             override suspend fun prepareDraftBranch(
                 draftId: String,
-                draftPreparationJob: DraftPreparationJob,
+                draftPreparationJob: DraftPreparationJob?,
                 call: TypedApplicationCall<DraftPreparationJob>,
             ) {
                 val task = manager.getOrCreateDraftPreparationTask(draftId).also { it.launch() }
@@ -336,7 +344,7 @@ class GitConnectorController(val manager: GitConnectorManager) {
 
             override suspend fun exportDraft(
                 draftId: String,
-                draftExportJob: DraftExportJob,
+                draftExportJob: DraftExportJob?,
                 call: TypedApplicationCall<DraftExportJob>,
             ) {
                 val task = manager.getOrCreateExportTask(draftId)

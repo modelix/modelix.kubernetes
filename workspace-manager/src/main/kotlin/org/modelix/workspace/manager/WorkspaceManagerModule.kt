@@ -165,7 +165,7 @@ fun Application.workspaceManagerModule() {
 
             override suspend fun updateMavenRepository(
                 repositoryId: String,
-                mavenRepository: MavenRepository,
+                mavenRepository: MavenRepository?,
                 call: ApplicationCall,
             ) {
                 TODO("Not yet implemented")
