@@ -20,7 +20,7 @@ plugins {
 group = "org.modelix.mps"
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 dependencies {

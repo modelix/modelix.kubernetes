@@ -14,7 +14,7 @@ tasks.distTar {
 }
 
 kotlin {
-    jvmToolchain(11) // it runs in the modelix/mps-vnc-baseimage which uses openjdk-17-jre
+    jvmToolchain(17) // it runs in the modelix/mps-vnc-baseimage which uses openjdk-17-jre
 }
 
 dependencies {
