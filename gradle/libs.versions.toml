@@ -76,7 +76,7 @@ modelix-mpsPlugins-diff = { group = "org.modelix.mps", name = "diff-plugin", ver
 modelix-mpsPlugins-generator = { group = "org.modelix.mps", name = "generator-execution-plugin", version.ref = "modelix-mps-plugins" }
 modelix-syncPlugin3 = { group = "org.modelix.mps", name = "mps-sync-plugin3", version.ref = "modelix-core" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version = "2.0.18" }
-zt-zip = { group = "org.zeroturnaround", name = "zt-zip", version = "1.17" }
+zt-zip = { group = "org.zeroturnaround", name = "zt-zip", version = "1.18.2" }
 
 [bundles]
 ktor-client = [
