@@ -2,7 +2,7 @@
 jetty = "11.0.26"
 jetty9 = "9.4.57.v20241219"
 jgit = "7.7.0.202606012155-r"
-junit = "6.1.0"
+junit = "6.1.2"
 keycloak="26.6.3"
 kotlin = "2.4.0"
 kotlin-logging = "3.0.5"
