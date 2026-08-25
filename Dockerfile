@@ -1,4 +1,4 @@
-FROM gradle:8.14.5-jdk17@sha256:d0c053f2371d09d9ace3ecd823ac7dac07e33280a4ab010fea23ea79107e8b17 AS builder
+FROM gradle:9.7.1-jdk17@sha256:79720ed2c6d00e4d0642aede904bfff1c14324d95047681ae0fa74a2aae40eba AS builder
 
 COPY ./ /project
 RUN cd /project && gradle :keycloak-extensions:assemble
