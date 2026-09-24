@@ -76,6 +76,14 @@ workspaces:
       repository: modelix/modelix-workspace-job
       tag: ""
       pullPolicy: IfNotPresent
+  # Results of external (CI) builds that are uploaded using the org.modelix.workspaces Gradle plugin.
+  artifacts:
+    storageSize: 10Gi
+    # Maximum size of a single uploaded artifact in mebibyte.
+    # Independent of the global maxBodySize, which is used for all other requests.
+    maxUploadSize: 2048
+    # Older artifacts are deleted, unless they are used by a workspace instance.
+    maxArtifactsPerWorkspace: 20
 
 ingress:
   enabled: true

@@ -58,7 +58,7 @@ object WorkspacesPermissionSchema {
 
                 resource("build-result") {
                     permission("write") {
-                        includedIn("workspace", "owner")
+                        description("Can upload artifacts that were built by an external CI pipeline")
                         permission("read")
                     }
                 }
@@ -76,6 +76,7 @@ object WorkspacesPermissionSchema {
                     }
                     permission("maintainer") {
                         includes("config", "write")
+                        includes("build-result", "write")
                         includes("shared-instance", "access")
                         includes("build-job", "restart")
                         permission("contributor") {
@@ -155,8 +156,8 @@ object WorkspacesPermissionSchema {
             val buildResult = BuildResult()
             inner class BuildResult {
                 val resource = this@Workspace.resource + "build-result"
-                val write = resource + "access"
-                val read = resource + "access"
+                val write = resource + "write"
+                val read = resource + "read"
             }
 
             val buildJob = BuildJob()

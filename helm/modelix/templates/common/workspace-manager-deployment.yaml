@@ -75,6 +75,12 @@ spec:
                 name: "{{ include "modelix.fullname" . }}-docker-registry-secret"
           - name: KESTRA_URL
             value: http://{{ .Release.Name }}-kestra-service:8080/
+          - name: WORKSPACE_ARTIFACTS_DIR
+            value: /workspace-manager/artifacts
+          - name: WORKSPACE_ARTIFACT_MAX_SIZE_MB
+            value: "{{ .Values.workspaces.artifacts.maxUploadSize }}"
+          - name: WORKSPACE_ARTIFACTS_MAX_PER_WORKSPACE
+            value: "{{ .Values.workspaces.artifacts.maxArtifactsPerWorkspace }}"
           - name: GIT_IMPORT_IMAGE
             value: "{{ .Values.dockerProxy.prefix }}{{ .Values.gitImport.image.repository }}:{{ .Values.gitImport.image.tag }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
@@ -113,6 +119,8 @@ spec:
             name: "{{ include "modelix.fullname" . }}-workspace-uploads"
           - mountPath: "/workspace-manager/config"
             name: "{{ include "modelix.fullname" . }}-workspace-config"
+          - mountPath: "/workspace-manager/artifacts"
+            name: "{{ include "modelix.fullname" . }}-workspace-artifacts"
           - name: "{{ include "modelix.fullname" . }}-workspace-secret"
             mountPath: /secrets/workspacesecret
             readOnly: true
@@ -132,6 +140,9 @@ spec:
         - name: "{{ include "modelix.fullname" . }}-workspace-config"
           persistentVolumeClaim:
             claimName: "{{ include "modelix.fullname" . }}-workspace-config"
+        - name: "{{ include "modelix.fullname" . }}-workspace-artifacts"
+          persistentVolumeClaim:
+            claimName: "{{ include "modelix.fullname" . }}-workspace-artifacts"
         - name: "{{ include "modelix.fullname" . }}-workspace-secret"
           secret:
             secretName: "{{ include "modelix.fullname" . }}-workspace-secret"

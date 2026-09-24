@@ -33,6 +33,13 @@ Otherwise, MPS (the JBR) will not use the correct memory limit.
 >     * "xyz.127.0.0.1.nip.io" is the hostname used to access the modelix instance. In a development environment you can use nip.io to get different hostnames that resolve to 127.0.0.1.
 
 
+## Building workspaces in your own CI pipeline
+
+Instead of letting Modelix build an MPS project inside the cluster,
+the build pipeline you already have can upload its result using the Gradle plugin `org.modelix.workspaces`.
+Set the build mode of the workspace to `EXTERNAL` and instances of it will run the uploaded artifact.
+See [workspace-gradle-plugin/README.md](workspace-gradle-plugin/README.md).
+
 ## Developing Modelix Workspaces
 
 This Helm chart is tightly coupled and has to be developed in together with [Modelix Workspace components](https://github.com/modelix/modelix.workspaces).

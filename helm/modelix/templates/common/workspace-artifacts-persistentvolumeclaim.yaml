@@ -1,0 +1,18 @@
+{{- if .Values.workspaces.enabled  -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    component: workspace-artifacts
+    {{- include "modelix.labels" . | nindent 4 }}
+  name: "{{ include "modelix.fullname" . }}-workspace-artifacts"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.workspaces.artifacts.storageSize }}
+  {{ if not (empty .Values.storageClassName) }}
+  storageClassName: {{ .Values.storageClassName }}
+  {{ end }}
+{{- end -}}

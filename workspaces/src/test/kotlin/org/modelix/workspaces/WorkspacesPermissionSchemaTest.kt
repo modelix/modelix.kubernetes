@@ -36,6 +36,34 @@ class WorkspacesPermissionSchemaTest {
         true,
     )
 
+    @Test
+    fun `maintainer can upload build results`() = runTest(
+        listOf(WorkspacesPermissionSchema.workspaces.workspace("123").maintainer),
+        WorkspacesPermissionSchema.workspaces.workspace("123").buildResult.write,
+        true,
+    )
+
+    @Test
+    fun `contributor cannot upload build results`() = runTest(
+        listOf(WorkspacesPermissionSchema.workspaces.workspace("123").contributor),
+        WorkspacesPermissionSchema.workspaces.workspace("123").buildResult.write,
+        false,
+    )
+
+    @Test
+    fun `viewer can read build results`() = runTest(
+        listOf(WorkspacesPermissionSchema.workspaces.workspace("123").viewer),
+        WorkspacesPermissionSchema.workspaces.workspace("123").buildResult.read,
+        true,
+    )
+
+    @Test
+    fun `build result writer can read build results`() = runTest(
+        listOf(WorkspacesPermissionSchema.workspaces.workspace("123").buildResult.write),
+        WorkspacesPermissionSchema.workspaces.workspace("123").buildResult.read,
+        true,
+    )
+
     private fun runTest(grantedPermissions: List<PermissionParts>, permissionToCheck: PermissionParts, shouldHavePermission: Boolean) {
         val util = ModelixJWTUtil()
         util.setHmac512Key("abc")

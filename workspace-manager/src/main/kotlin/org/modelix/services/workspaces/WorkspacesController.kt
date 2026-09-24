@@ -49,6 +49,7 @@ class WorkspacesController(
     val instancesManager: WorkspaceInstancesManager,
     val buildManager: WorkspaceBuildManager,
     val gitConnectorManager: GitConnectorManager,
+    val artifactStore: WorkspaceArtifactStore,
 ) {
 
     fun install(route: Route) {
@@ -78,6 +79,7 @@ class WorkspacesController(
                 call: ApplicationCall,
             ) {
                 manager.removeWorkspace(workspaceId)
+                artifactStore.deleteAll(workspaceId)
                 call.respond(HttpStatusCode.OK)
             }
 
@@ -181,10 +183,14 @@ class WorkspacesController(
                 }
 
                 val id = UUID.randomUUID().toString()
+                val storedWorkspace = manager.getWorkspace(workspaceInstance.config.id)
                 instancesManager.updateInstancesMap { instances ->
                     instances.plus(
                         id to workspaceInstance.copy(
                             id = id,
+                            config = workspaceInstance.config.copy(
+                                buildMode = workspaceInstance.config.buildMode ?: storedWorkspace?.buildMode,
+                            ),
                             owner = call.getUserName(),
                             state = WorkspaceInstanceState.CREATED,
                             readonly = readonly,

@@ -12,7 +12,7 @@ ktor = "3.6.0"
 logback = "1.6.3"
 modelix-core = "19.4.1"
 modelix-mps-plugins = "0.12.0"
-modelix-openapi = "1.6.1"
+modelix-openapi = "1.7.0"
 
 [libraries]
 auth0-jwt = { group = "com.auth0", name = "java-jwt", version = "4.6.1" }
@@ -36,6 +36,8 @@ jgit-server = { group = "org.eclipse.jgit", name = "org.eclipse.jgit.http.server
 json = { group = "org.json", name = "json", version = "20260814" }
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.104.0" }
 keycloak-core = { group = "org.keycloak", name = "keycloak-core", version.ref = "keycloak" }
 keycloak-server-spi = { group = "org.keycloak", name = "keycloak-server-spi", version.ref = "keycloak" }
@@ -62,6 +64,7 @@ ktor-server-data-conversion = { group = "io.ktor", name = "ktor-server-data-conv
 ktor-server-html-builder = { group = "io.ktor", name = "ktor-server-html-builder", version.ref = "ktor" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor" }
 ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-test-host = { group = "io.ktor", name = "ktor-server-test-host", version.ref = "ktor" }
 kubernetes-client = { group = "io.kubernetes", name = "client-java", version = "27.0.0" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 maven-invoker = { group = "org.apache.maven.shared", name = "maven-invoker", version = "3.3.0" }
