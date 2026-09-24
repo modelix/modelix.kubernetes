@@ -107,7 +107,7 @@ class ModelServerWorkspacePersistence(authTokenProvider: () -> String?) : Worksp
     override fun update(workspace: InternalWorkspaceConfig): WorkspaceHash {
         val mpsVersion = workspace.mpsVersion
         require(mpsVersion == null || mpsVersion.matches(Regex("""20\d\d\.\d"""))) {
-            "Invalid major MPS version: '$mpsVersion'. Examples for valid values: '2020.3', '2021.1', '2021.2'."
+            "Invalid major MPS version: '$mpsVersion'. Examples for valid values: '2024.1', '2025.1'."
         }
         val id = workspace.id
         val json = Json.encodeToString(workspace)

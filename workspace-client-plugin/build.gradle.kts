@@ -57,13 +57,9 @@ val syncPluginDir = pluginDependenciesDir.get().asFile.resolve("mps-sync-plugin3
 val supportedMPSVersions = project.properties["mpsMajorVersions"].toString().split(",").sorted()
 fun String.toPlatformVersion(): String = replace(Regex("""20(\d\d)\.(\d+).*"""), "$1$2")
 
-// The IntelliJ Platform Gradle Plugin 2.x supports 2022.3 as the oldest target platform.
-// The plugin is still marked as compatible with older versions by the `sinceBuild` below.
-val compileAgainstPlatformVersion = (supportedMPSVersions + "2022.3").filter { it >= "2022.3" }.min()
-
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(compileAgainstPlatformVersion)
+        intellijIdeaCommunity(supportedMPSVersions.first())
         localPlugin(syncPluginDir)
     }
 }
