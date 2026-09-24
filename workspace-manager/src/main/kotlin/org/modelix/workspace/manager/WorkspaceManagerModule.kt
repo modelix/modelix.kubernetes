@@ -66,6 +66,8 @@ import org.modelix.services.mavenconnector.stubs.controllers.TypedApplicationCal
 import org.modelix.services.mavenconnector.stubs.models.MavenConnectorConfig
 import org.modelix.services.mavenconnector.stubs.models.MavenRepository
 import org.modelix.services.mavenconnector.stubs.models.MavenRepositoryList
+import org.modelix.services.workspaces.WorkspaceArtifactStore
+import org.modelix.services.workspaces.WorkspaceArtifactsController
 import org.modelix.services.workspaces.WorkspacesController
 import org.modelix.workspaces.Credentials
 import org.modelix.workspaces.GitRepository
@@ -98,7 +100,17 @@ fun Application.workspaceManagerModule() {
             }.build(),
     )
     val gitController = GitConnectorController(gitManager)
-    val instancesManager = WorkspaceInstancesManager(manager, buildManager, coroutinesScope = this, gitManager = gitManager)
+    val artifactStore = WorkspaceArtifactStore(
+        rootDir = File(System.getenv("WORKSPACE_ARTIFACTS_DIR") ?: "/workspace-manager/artifacts"),
+        maxArtifactsPerWorkspace = System.getenv("WORKSPACE_ARTIFACTS_MAX_PER_WORKSPACE")?.toIntOrNull() ?: 20,
+    )
+    val instancesManager = WorkspaceInstancesManager(
+        workspaceManager = manager,
+        buildManager = buildManager,
+        gitManager = gitManager,
+        artifactStore = artifactStore,
+        coroutinesScope = this,
+    )
     val deploymentsProxy = DeploymentsProxy(instancesManager)
 
     deploymentsProxy.startServer()
@@ -135,7 +147,14 @@ fun Application.workspaceManagerModule() {
 //        }
 
         MavenControllerImpl().install(this)
-        WorkspacesController(manager, instancesManager, buildManager, gitManager).install(this)
+        WorkspacesController(manager, instancesManager, buildManager, gitManager, artifactStore).install(this)
+        WorkspaceArtifactsController(
+            artifactStore = artifactStore,
+            jwtUtil = manager.jwtUtil,
+            workspaceExists = { manager.getWorkspace(it) != null },
+            artifactIdsInUse = { instancesManager.getArtifactIdsInUse() },
+            maxUploadSizeBytes = (System.getenv("WORKSPACE_ARTIFACT_MAX_SIZE_MB")?.toLongOrNull() ?: 2048L) * 1024L * 1024L,
+        ).install(this)
         gitController.install(this)
 
         modelixMavenConnectorRoutes(object : ModelixMavenConnectorController {
@@ -1194,12 +1213,7 @@ fun Application.workspaceManagerModule() {
         get("baseimage/{mpsVersion}/context.tar.gz") {
             val mpsVersion = call.parameters["mpsVersion"]!!
 
-            val pluginFiles = listOf(
-                "diff-plugin.zip",
-                "generator-execution-plugin.zip",
-                "mps-sync-plugin3.zip",
-                "workspace-client-plugin.zip",
-            )
+            val pluginFiles = MODELIX_MPS_PLUGIN_FILES
 
             call.respondTarGz { tar ->
                 val content = """

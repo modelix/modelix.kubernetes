@@ -1,0 +1,38 @@
+{{ if and .Values.ingress.enabled .Values.workspaces.enabled }}
+# Uploads of workspace artifacts (results of CI builds) are larger than other requests.
+# A separate ingress allows a different body size limit for this path only.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ include "modelix.fullname" . }}-ingress-artifact-upload"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.workspaces.artifacts.maxUploadSize }}m
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    {{ if and (not .Values.ingress.tls.crt) (not .Values.ingress.certSecret) }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    {{ end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  tls:
+  - hosts:
+    - "{{ .Values.ingress.hostname }}"
+    {{ if not .Values.ingress.certSecret }}
+    secretName: "{{ include "modelix.fullname" . }}-tls-secret"
+    {{ else }}
+    secretName: "{{ .Values.ingress.certSecret }}"
+    {{ end }}
+  rules:
+    - host: "{{ .Values.ingress.hostname }}"
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: "{{ include "modelix.fullname" . }}-proxy"
+                port:
+                  number: 80
+            path: /modelix/workspaces/workspaces/[^/]+/artifacts/upload
+{{ end }}

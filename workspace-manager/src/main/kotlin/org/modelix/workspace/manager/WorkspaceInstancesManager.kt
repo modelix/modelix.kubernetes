@@ -28,12 +28,18 @@ import org.modelix.model.lazy.BranchReference
 import org.modelix.model.server.ModelServerPermissionSchema
 import org.modelix.services.gitconnector.GitConnectorManager
 import org.modelix.services.workspaces.ContinuingCallback
+import org.modelix.services.workspaces.WorkspaceArtifactStore
 import org.modelix.services.workspaces.configForBuild
 import org.modelix.services.workspaces.executeSuspending
 import org.modelix.services.workspaces.metadata
 import org.modelix.services.workspaces.spec
+import org.modelix.services.workspaces.stubs.models.WorkspaceArtifact
+import org.modelix.services.workspaces.stubs.models.WorkspaceBuildMode
 import org.modelix.services.workspaces.stubs.models.WorkspaceInstance
 import org.modelix.services.workspaces.stubs.models.WorkspaceInstanceState
+import org.modelix.services.workspaces.validMPSVersion
+import org.modelix.services.workspaces.validMemoryLimit
+import org.modelix.workspaces.DEFAULT_MPS_VERSION
 import org.modelix.workspaces.WorkspacesPermissionSchema
 import java.io.File
 import java.util.Collections
@@ -42,12 +48,37 @@ import kotlin.coroutines.suspendCoroutine
 
 private val LOG = KotlinLogging.logger {}
 
+/**
+ * The MPS plugins that are installed into every workspace instance. They are served by the workspace-manager as
+ * static resources.
+ */
+val MODELIX_MPS_PLUGIN_FILES = listOf(
+    "diff-plugin.zip",
+    "generator-execution-plugin.zip",
+    "mps-sync-plugin3.zip",
+    "workspace-client-plugin.zip",
+)
+
+/**
+ * For workspaces with build mode EXTERNAL: the artifact that should be used for an instance, or the reason why there
+ * is none.
+ */
+data class ArtifactResolution(val artifact: WorkspaceArtifact?, val problem: String?)
+
+fun WorkspaceArtifact.describe(): String = listOfNotNull(
+    id,
+    label?.let { "label: $it" },
+    gitBranch?.let { "branch: $it" },
+    gitCommit?.let { "commit: ${it.take(10)}" },
+).let { it.first() + it.drop(1).joinToString(", ").let { details -> if (details.isEmpty()) "" else " ($details)" } }
+
 private data class InstancesManagerState(
     val instances: Map<String, WorkspaceInstance> = emptyMap(),
 )
 
 class WorkspaceInstanceStateValues(
     var imageTask: WorkspaceImageTask? = null,
+    var artifact: ArtifactResolution? = null,
     var draftBranches: List<Result<BranchReference>?> = emptyList(),
     var deployment: V1Deployment? = null,
     var pod: V1Pod? = null,
@@ -56,10 +87,15 @@ class WorkspaceInstanceStateValues(
     fun deriveState(): WorkspaceInstanceState {
         val image = imageTask?.getOutput()
         val imageTaskState = imageTask?.getState()
+        val artifact = artifact
         return when {
             !enabled -> WorkspaceInstanceState.DISABLED
             (deployment?.status?.readyReplicas ?: 0) >= 1 -> WorkspaceInstanceState.RUNNING
             deployment != null -> WorkspaceInstanceState.LAUNCHING
+            artifact != null -> when {
+                artifact.artifact != null && draftBranches.all { it?.getOrNull() != null } -> WorkspaceInstanceState.LAUNCHING
+                else -> WorkspaceInstanceState.WAITING_FOR_BUILD
+            }
             image?.isFailure == true -> WorkspaceInstanceState.BUILD_FAILED
             image?.getOrNull() != null && draftBranches.all { it?.getOrNull() != null } -> WorkspaceInstanceState.LAUNCHING
             else -> when (imageTaskState) {
@@ -79,7 +115,13 @@ class WorkspaceInstanceStateValues(
         if (!enabled) text += "Instance is disabled."
         if (deployment != null) text += "Deployment created."
         if ((deployment?.status?.readyReplicas ?: 0) >= 1) text += "Pod is ready."
-        if (imageTask == null) {
+        val artifact = artifact
+        val usedArtifactId = deployment?.metadata?.annotations?.get(WorkspaceInstancesManager.ARTIFACT_ID_ANNOTATION)
+        if (usedArtifactId != null) {
+            text += "Running artifact $usedArtifactId."
+        } else if (artifact != null) {
+            text += artifact.artifact?.let { "Using artifact ${it.describe()}." } ?: artifact.problem.orEmpty()
+        } else if (imageTask == null) {
             text += "Build task not created yet."
         } else {
             text += "Build task state: ${imageTask?.getState()}."
@@ -105,14 +147,19 @@ class WorkspaceInstancesManager(
     val workspaceManager: WorkspaceManager,
     val buildManager: WorkspaceBuildManager,
     val gitManager: GitConnectorManager,
+    val artifactStore: WorkspaceArtifactStore,
     val coroutinesScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) {
     companion object {
         val KUBERNETES_NAMESPACE = System.getenv("WORKSPACE_CLIENT_NAMESPACE") ?: "default"
         val INSTANCE_PREFIX = System.getenv("WORKSPACE_CLIENT_PREFIX") ?: "wsclt-"
         val INTERNAL_DOCKER_REGISTRY_AUTHORITY = requireNotNull(System.getenv("INTERNAL_DOCKER_REGISTRY_AUTHORITY"))
+        val MPS_BASEIMAGE_NAME: String? = System.getenv("MPS_BASEIMAGE_NAME")
+        val MPS_BASEIMAGE_VERSION: String? = System.getenv("MPS_BASEIMAGE_VERSION")
+        val WORKSPACE_MANAGER_INTERNAL_URL = "http://${WorkspaceJobQueue.HELM_PREFIX}workspace-manager:28104"
         const val TIMEOUT_SECONDS = 10
         const val INSTANCE_ID_LABEL = "modelix.workspace.instance.id"
+        const val ARTIFACT_ID_ANNOTATION = "modelix.workspace.artifact.id"
 
         fun WorkspaceInstance.instanceName() = INSTANCE_PREFIX + id
     }
@@ -122,6 +169,9 @@ class WorkspaceInstancesManager(
     }
 
     private val indexWasReady: MutableSet<String> = Collections.synchronizedSet(HashSet())
+
+    @Volatile
+    private var artifactIdsOfDeployments: Set<String> = emptySet()
     private val jwtUtil = ModelixJWTUtil().also { it.loadKeysFromEnvironment() }
 
     private val reconciler = Reconciler(coroutinesScope, InstancesManagerState(), ::reconcile)
@@ -163,8 +213,11 @@ class WorkspaceInstancesManager(
             val values = stateValues[config.id] ?: continue
             values.enabled = config.enabled
 
-            val imageTask = buildManager.getOrCreateWorkspaceImageTask(config.configForBuild(gitManager))
-            values.imageTask = imageTask
+            if (isExternalBuild(config)) {
+                values.artifact = resolveArtifact(config)
+            } else {
+                values.imageTask = buildManager.getOrCreateWorkspaceImageTask(config.configForBuild(gitManager))
+            }
 
             values.draftBranches = config.drafts.orEmpty().map { draftId ->
                 gitManager.getOrCreateDraftPreparationTask(draftId).also { it.launch() }
@@ -187,7 +240,43 @@ class WorkspaceInstancesManager(
             val instanceId = deployment.metadata?.labels?.get(INSTANCE_ID_LABEL) ?: continue
             existingDeployments[instanceId] = deployment
         }
+        artifactIdsOfDeployments = existingDeployments.values
+            .mapNotNull { it.metadata?.annotations?.get(ARTIFACT_ID_ANNOTATION) }
+            .toSet()
         return existingDeployments
+    }
+
+    /**
+     * Artifacts that are used by instances and shouldn't be deleted.
+     */
+    fun getArtifactIdsInUse(): Set<String> {
+        return getInstancesMap().values.mapNotNull { it.artifactId }.toSet() + artifactIdsOfDeployments
+    }
+
+    /**
+     * The build mode is read from the current workspace configuration, because the configuration stored in the
+     * instance is a copy from the time the instance was created.
+     */
+    fun isExternalBuild(instance: WorkspaceInstance): Boolean {
+        val buildMode = workspaceManager.getWorkspace(instance.config.id)?.buildMode ?: instance.config.buildMode
+        return buildMode == WorkspaceBuildMode.EXTERNAL
+    }
+
+    fun resolveArtifact(instance: WorkspaceInstance): ArtifactResolution {
+        val workspaceId = instance.config.id
+        val explicitArtifactId = instance.artifactId
+        if (explicitArtifactId != null) {
+            val artifact = artifactStore.get(workspaceId, explicitArtifactId)
+            return ArtifactResolution(artifact, if (artifact == null) "Artifact $explicitArtifactId not found." else null)
+        }
+
+        val draftCommit = instance.drafts.orEmpty().firstNotNullOfOrNull { gitManager.getDraft(it)?.baseGitCommit }
+        val artifact = artifactStore.findNewest(workspaceId, draftCommit)
+        return when {
+            artifact != null -> ArtifactResolution(artifact, null)
+            draftCommit != null -> ArtifactResolution(null, "Waiting for a CI build of git commit $draftCommit to be uploaded.")
+            else -> ArtifactResolution(null, "Waiting for a CI build to be uploaded.")
+        }
     }
 
     private suspend fun getExistingPods(): Map<String, V1Pod> {
@@ -230,6 +319,24 @@ class WorkspaceInstancesManager(
             }
         }
         for (instance in toAdd.values) {
+            if (isExternalBuild(instance)) {
+                try {
+                    val artifact = resolveArtifact(instance).artifact ?: continue
+                    val draftBranches = instance.drafts.orEmpty().map { draftId ->
+                        gitManager.getOrCreateDraftPreparationTask(draftId).also { it.launch() }
+                    }.map { it.getOutput()?.getOrNull() }
+                    if (draftBranches.all { it != null }) {
+                        val mpsVersion = artifact.mpsVersion ?: instance.config.validMPSVersion() ?: DEFAULT_MPS_VERSION
+                        val image = "${checkNotNull(MPS_BASEIMAGE_NAME) { "MPS_BASEIMAGE_NAME not set" }}:" +
+                            "${checkNotNull(MPS_BASEIMAGE_VERSION) { "MPS_BASEIMAGE_VERSION not set" }}-mps$mpsVersion"
+                        createDeployment(instance, image, draftBranches.map { it!! }, artifact)
+                        createService(instance)
+                    }
+                } catch (e: Exception) {
+                    LOG.error("Failed to create deployment for workspace instance ${instance.id}", e)
+                }
+                continue
+            }
             try {
                 val workspaceConfig = instance.configForBuild(gitManager)
                 buildManager.getOrCreateWorkspaceImageTask(workspaceConfig)
@@ -242,7 +349,9 @@ class WorkspaceInstancesManager(
 
                 val image = imageTask.getOutput()?.getOrNull()
                 if (image != null && draftBranches.all { it != null }) {
-                    createDeployment(instance, image, draftBranches.map { it!! })
+                    // The image registry is made available to the container runtime via a NodePort
+                    // localhost in this case is the kubernetes node, not the instances-manager
+                    createDeployment(instance, "$INTERNAL_DOCKER_REGISTRY_AUTHORITY/${image.name}:${image.tag}", draftBranches.map { it!! })
                     createService(instance)
                 }
             } catch (e: Exception) {
@@ -337,8 +446,9 @@ class WorkspaceInstancesManager(
 
     suspend fun createDeployment(
         workspaceInstance: WorkspaceInstance,
-        image: ImageNameAndTag,
+        image: String,
         draftBranches: List<BranchReference>,
+        artifact: WorkspaceArtifact? = null,
     ): V1Deployment {
         val instanceName = workspaceInstance.instanceName()
         val workspaceId = workspaceInstance.config.id
@@ -357,6 +467,7 @@ class WorkspaceInstancesManager(
         deployment.metadata {
             name(instanceName)
             putLabelsItem(INSTANCE_ID_LABEL, workspaceInstance.id)
+            if (artifact != null) putAnnotationsItem(ARTIFACT_ID_ANNOTATION, artifact.id)
         }
         deployment.spec {
             selector.putMatchLabelsItem(INSTANCE_ID_LABEL, workspaceInstance.id)
@@ -370,12 +481,20 @@ class WorkspaceInstancesManager(
                 }
                 // addEnvItem(V1EnvVar().name("modelix_workspace_hash").value(workspace.hash().hash))
                 addEnvItem(V1EnvVar().name("WORKSPACE_MODEL_SYNC_ENABLED").value(true.toString()))
+                if (artifact != null) {
+                    for ((name, value) in artifactEnvironmentVariables(workspaceInstance, artifact)) {
+                        addEnvItem(V1EnvVar().name(name).value(value))
+                    }
+                }
             }
         }
 
         val hasWritePermission = workspaceInstance.readonly == false
         val newPermissions = ArrayList<PermissionParts>()
         newPermissions += WorkspacesPermissionSchema.workspaces.workspace(workspaceId).config.read
+        if (artifact != null) {
+            newPermissions += WorkspacesPermissionSchema.workspaces.workspace(workspaceId).buildResult.read
+        }
         for (draft in workspaceInstance.drafts.orEmpty().mapNotNull { gitManager.getDraft(it) }) {
             val gitRepo = gitManager.getRepository(draft.gitRepositoryId) ?: continue
             val modelixRepo = gitRepo.modelixRepository ?: continue
@@ -411,13 +530,29 @@ class WorkspaceInstancesManager(
         return coreApi.createNamespacedService(KUBERNETES_NAMESPACE, service).execute()
     }
 
-    private fun loadWorkspaceSpecificValues(workspaceInstance: WorkspaceInstance, deployment: V1Deployment, image: ImageNameAndTag) {
+    /**
+     * Instances of workspaces that are built externally run the unmodified MPS base image.
+     * The artifact and the modelix plugins are installed by a script that runs before MPS starts.
+     * See `workspace-artifact-startup.sh`.
+     */
+    private fun artifactEnvironmentVariables(workspaceInstance: WorkspaceInstance, artifact: WorkspaceArtifact): Map<String, String> {
+        val memoryLimit = Quantity.fromString(workspaceInstance.config.validMemoryLimit() ?: "2Gi").number
+        val heapSizeMega = (heapSizeFromContainerLimit(memoryLimit) / 1024.toBigDecimal() / 1024.toBigDecimal()).toBigInteger()
+        return mapOf(
+            "PRE_STARTUP_SCRIPT_URL" to "$WORKSPACE_MANAGER_INTERNAL_URL/static/workspace-artifact-startup.sh",
+            "MODELIX_WORKSPACE_ARTIFACT_URL" to
+                "$WORKSPACE_MANAGER_INTERNAL_URL/modelix/workspaces/workspaces/${artifact.workspaceId}/artifacts/${artifact.id}/content.zip",
+            "MODELIX_PLUGINS_BASE_URL" to "$WORKSPACE_MANAGER_INTERNAL_URL/static/",
+            "MODELIX_PLUGINS" to MODELIX_MPS_PLUGIN_FILES.joinToString(" "),
+            "MPS_MAX_HEAP_SIZE_MB" to heapSizeMega.toString(),
+        )
+    }
+
+    private fun loadWorkspaceSpecificValues(workspaceInstance: WorkspaceInstance, deployment: V1Deployment, image: String) {
         try {
             val container = deployment.spec!!.template.spec!!.containers[0]
 
-            // The image registry is made available to the container runtime via a NodePort
-            // localhost in this case is the kubernetes node, not the instances-manager
-            container.image = "${INTERNAL_DOCKER_REGISTRY_AUTHORITY}/${image.name}:${image.tag}"
+            container.image = image
 
             val resources = container.resources ?: return
             val memoryLimit = Quantity.fromString(workspaceInstance.config.memoryLimit)

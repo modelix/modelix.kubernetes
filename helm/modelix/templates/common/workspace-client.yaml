@@ -81,6 +81,11 @@ data:
           restartPolicy: Always
           imagePullSecrets:
             - name: "{{ include "modelix.fullname" . }}-docker-registry-secret"
+            {{- if .Values.dockerProxy.secret }}
+            - name: {{ .Values.dockerProxy.secret }}
+            {{- else if .Values.dockerProxy.secret64 }}
+            - name: "{{ include "modelix.fullname" . }}-docker-secret"
+            {{- end }}
   service: |
     apiVersion: v1
     kind: Service

@@ -31,6 +31,7 @@ include("keycloak-extensions")
 
 include("gitui")
 include("workspace-client-plugin")
+include("workspace-gradle-plugin")
 include("workspace-job")
 include("workspace-manager")
 include("workspaces")

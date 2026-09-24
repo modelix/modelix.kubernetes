@@ -26,6 +26,7 @@ fun WorkspaceConfig.merge(other: WorkspaceConfig) = copy(
     mavenArtifacts = other.mavenArtifacts ?: mavenArtifacts,
     buildConfig = other.buildConfig ?: buildConfig,
     runConfig = other.runConfig ?: runConfig,
+    buildMode = other.buildMode ?: buildMode,
 )
 
 fun WorkspaceConfig.validMPSVersion() = mpsVersion.takeIf { it.isNotEmpty() }

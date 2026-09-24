@@ -55,6 +55,8 @@ dependencies {
     mpsPlugins(project(":workspace-client-plugin", configuration = "pluginZip"))
     runtimeOnly(libs.slf4j.simple)
     testImplementation(kotlin("test"))
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.ktor.client.content.negotiation)
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
