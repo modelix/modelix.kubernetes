@@ -7,13 +7,19 @@ buildscript {
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
-    id("org.jetbrains.intellij") version "1.17.4"
+    alias(libs.plugins.intellij.platform)
 }
 
 group = "org.modelix.mps"
 
 kotlin {
     jvmToolchain(17)
+}
+
+repositories {
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
@@ -51,26 +57,41 @@ val syncPluginDir = pluginDependenciesDir.get().asFile.resolve("mps-sync-plugin3
 val supportedMPSVersions = project.properties["mpsMajorVersions"].toString().split(",").sorted()
 fun String.toPlatformVersion(): String = replace(Regex("""20(\d\d)\.(\d+).*"""), "$1$2")
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version = supportedMPSVersions.first()
+// The IntelliJ Platform Gradle Plugin 2.x supports 2022.3 as the oldest target platform.
+// The plugin is still marked as compatible with older versions by the `sinceBuild` below.
+val compileAgainstPlatformVersion = (supportedMPSVersions + "2022.3").filter { it >= "2022.3" }.min()
+
+dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity(compileAgainstPlatformVersion)
+        localPlugin(syncPluginDir)
+    }
+}
+
+// Configure IntelliJ Platform Gradle Plugin
+// Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
+intellijPlatform {
     instrumentCode = false
-    plugins.set(listOf(syncPluginDir))
+    buildSearchableOptions = false
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = supportedMPSVersions.first().toPlatformVersion()
+            untilBuild = supportedMPSVersions.last().toPlatformVersion() + ".*"
+        }
+    }
+}
+
+// Consumed by the workspace-manager, which bundles the plugin zip.
+val pluginZip by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+}
+artifacts {
+    add(pluginZip.name, tasks.buildPlugin)
 }
 
 tasks {
-    patchPluginXml {
-        sinceBuild.set(supportedMPSVersions.first().toPlatformVersion())
-        untilBuild.set(supportedMPSVersions.last().toPlatformVersion() + ".*")
-    }
-
-    buildSearchableOptions {
-        enabled = false
-    }
-
     runIde {
         systemProperty("idea.platform.prefix", "Idea")
-        autoReloadPlugins.set(true)
     }
 }

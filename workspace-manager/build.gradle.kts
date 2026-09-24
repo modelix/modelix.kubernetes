@@ -52,7 +52,7 @@ dependencies {
     implementation(project(":workspaces"))
     implementation(libs.modelix.api.server.stubs)
     mpsPlugins(libs.bundles.modelix.mpsPlugins.all)
-    mpsPlugins(project(":workspace-client-plugin", configuration = "archives"))
+    mpsPlugins(project(":workspace-client-plugin", configuration = "pluginZip"))
     runtimeOnly(libs.slf4j.simple)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.api)
