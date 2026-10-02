@@ -88,6 +88,21 @@ http://{{ include "modelix.fullname" . }}-keycloak:8080/
   value: "{{ .Values.authorization.enabled }}"
 {{- end }}
 
+{{/*
+Since PostgreSQL 18, the official image stores the data in /var/lib/postgresql/<major version>/docker by default.
+PGDATA is set explicitly to keep using the existing data directory of deployments created with older versions.
+*/}}
+{{- define "modelix.db.env" -}}
+- name: POSTGRES_PASSWORD
+  value: "{{ .Values.db.password }}"
+- name: POSTGRES_USER
+  value: "{{ .Values.db.user }}"
+- name: POSTGRES_DB
+  value: "{{ .Values.db.db }}"
+- name: PGDATA
+  value: /var/lib/postgresql/data/pgdata
+{{- end }}
+
 {{- define "modelix.commonVariables" -}}
 {{- if .Values.httpProxy }}
 - name: MODELIX_HTTP_PROXY
