@@ -113,7 +113,7 @@ db:
 postgres:
   image:
     repository: postgres
-    tag: 18.6@sha256:06cad38a5d9f5d24b4d83d86def30795d5e4b757fedbf5281172b576dedcd941
+    tag: 18.6@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
     pullPolicy: IfNotPresent
   # Runs pgautoupgrade as an init container if the database files were created by an older major version of
   # PostgreSQL. It does nothing on a fresh installation or if the database is already at the current major version.
