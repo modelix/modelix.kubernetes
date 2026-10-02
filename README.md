@@ -38,7 +38,8 @@ Otherwise, MPS (the JBR) will not use the correct memory limit.
 Instead of letting Modelix build an MPS project inside the cluster,
 the build pipeline you already have can upload its result using the Gradle plugin `org.modelix.workspaces`.
 Set the build mode of the workspace to `EXTERNAL` and instances of it will run the uploaded artifact.
-See [workspace-gradle-plugin/README.md](workspace-gradle-plugin/README.md).
+See [docs/external-ci-builds.md](docs/external-ci-builds.md) for a guide
+and [workspace-gradle-plugin/README.md](workspace-gradle-plugin/README.md) for the reference of the plugin.
 
 ## Developing Modelix Workspaces
 
