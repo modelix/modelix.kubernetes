@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MPSProject">
+    <projectModules>
+      <modulePath path="$PROJECT_DIR$/languages/my.language.runtime/my.language.runtime.msd" folder="" />
+      <modulePath path="$PROJECT_DIR$/languages/my.language.sandbox/my.language.sandbox.msd" folder="" />
+      <modulePath path="$PROJECT_DIR$/languages/my.language/my.language.mpl" folder="" />
+      <modulePath path="$PROJECT_DIR$/solutions/my.solution.added.on.feature.branch.b.renamed/my.solution.added.on.feature.branch.b.renamed.msd" folder="" />
+      <modulePath path="$PROJECT_DIR$/solutions/my.solution/my.solution.msd" folder="" />
+    </projectModules>
+  </component>
+</project>
