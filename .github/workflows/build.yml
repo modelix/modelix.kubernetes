@@ -76,3 +76,27 @@ jobs:
           path: |
             */build/test-results
             */build/reports
+
+  # Ensures that existing deployments can be upgraded to the current Helm chart without losing the database content.
+  db-upgrade:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 1.2.4: last release with PostgreSQL 17
+        # 1.3.0: first release with PostgreSQL 18
+        old-chart: ['1.2.4', '1.3.0']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install kubectl and helm
+        uses: yokawasa/action-setup-kube-tools@b16d49b2c459d33cf9d4c300a220ef0bcdbc730a # v0.14.0
+        with:
+          kubectl: '1.33.2'
+          helm: '3.18.3'
+
+      - name: Kubernetes KinD Cluster
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1
+
+      - name: Upgrade from ${{ matrix.old-chart }}
+        run: ./ci/test-db-upgrade.sh '${{ matrix.old-chart }}'
