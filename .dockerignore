@@ -10,4 +10,13 @@
 /README.md
 /skaffold-test.yaml
 /skaffold-build.yaml
-/keycloak-extensions/build
+
+# Build output and caches. Only the keycloak builder stage uses the repository root as its context.
+# Excluding these also avoids "creating tar gz: lstat ...: no such file or directory" errors when another
+# build (e.g. the jib build of workspace-manager) modifies them while Docker creates the context archive.
+/.intellijPlatform
+/.gradle
+/node_modules
+/build
+/*/build
+**/.kotlin
