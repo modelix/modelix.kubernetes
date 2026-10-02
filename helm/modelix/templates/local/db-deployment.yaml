@@ -76,12 +76,7 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/postgresql/data
             name: db-data
-          - name: initdb
-            mountPath: /docker-entrypoint-initdb.d/initdb.sql
       volumes:
-      - name: initdb
-        configMap:
-          name: "{{ include "modelix.fullname" . }}-initdb"
       - name: db-data
         persistentVolumeClaim:
           claimName: "{{ include "modelix.fullname" . }}-db-data"
