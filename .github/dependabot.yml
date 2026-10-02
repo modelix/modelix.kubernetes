@@ -22,3 +22,9 @@ updates:
       - "/helm/modelix"
     schedule:
       interval: "daily"
+    groups:
+      # The major version of pgautoupgrade has to match the major version of postgres
+      postgres:
+        patterns:
+          - "postgres"
+          - "pgautoupgrade/pgautoupgrade"

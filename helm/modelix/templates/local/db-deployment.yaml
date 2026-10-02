@@ -1,4 +1,9 @@
 {{- if not .Values.db.useGCloud }}
+{{- $postgresMajor := regexFind "^[0-9]+" .Values.postgres.image.tag }}
+{{- $autoupgradeMajor := regexFind "^[0-9]+" .Values.postgres.autoupgrade.image.tag }}
+{{- if and .Values.postgres.autoupgrade.enabled (ne $postgresMajor $autoupgradeMajor) }}
+{{- fail (printf "postgres.autoupgrade.image.tag (%s) must have the same major version as postgres.image.tag (%s)" .Values.postgres.autoupgrade.image.tag .Values.postgres.image.tag) }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,23 +25,46 @@ spec:
         component: db
         {{- include "modelix.selectorLabels" . | nindent 8 }}
     spec:
-      containers:
-      - env:
-        - name: POSTGRES_PASSWORD
-          value: "{{ .Values.db.password }}"
-        - name: POSTGRES_USER
-          value: "{{ .Values.db.user }}"
-        - name: POSTGRES_DB
-          value: "{{ .Values.db.db }}"
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        {{ if .Values.postgres.autoupgrade.enabled }}
+      {{- if .Values.postgres.autoupgrade.enabled }}
+      initContainers:
+      - name: db-upgrade
         image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.autoupgrade.image.repository }}:{{ .Values.postgres.autoupgrade.image.tag }}"
         imagePullPolicy: {{ .Values.postgres.autoupgrade.image.pullPolicy }}
-        {{ else }}
+        command: ["bash", "-ec"]
+        args:
+          - |
+            TARGET_VERSION="{{ $postgresMajor }}"
+            if [ ! -s "$PGDATA/PG_VERSION" ]; then
+              echo "No existing database found in $PGDATA. Nothing to upgrade."
+              exit 0
+            fi
+            CURRENT_VERSION="$(cat "$PGDATA/PG_VERSION")"
+            if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+              echo "Database is already at PostgreSQL $TARGET_VERSION. Nothing to upgrade."
+              exit 0
+            fi
+            echo "Upgrading database from PostgreSQL $CURRENT_VERSION to $TARGET_VERSION"
+            exec docker-entrypoint.sh postgres
+        env:
+        {{- include "modelix.db.env" . | nindent 8 }}
+        - name: PGAUTO_ONESHOT
+          value: "yes"
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "0.1"
+          limits:
+            memory: "500Mi"
+            cpu: "1.0"
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: db-data
+      {{- end }}
+      containers:
+      - env:
+        {{- include "modelix.db.env" . | nindent 8 }}
         image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
         imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
-        {{ end }}
         name: db
         resources:
           requests:
