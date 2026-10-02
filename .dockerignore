@@ -17,5 +17,6 @@
 /.intellijPlatform
 /.gradle
 /node_modules
-**/build
+/build
+/*/build
 **/.kotlin
