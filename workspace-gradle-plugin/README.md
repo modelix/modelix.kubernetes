@@ -4,6 +4,10 @@ Publishes the result of a CI build of an MPS project to a Modelix workspace.
 Instances of the workspace then run exactly what your CI pipeline built,
 instead of building the project inside the Kubernetes cluster.
 
+For a step-by-step guide (workspace setup, CI integration, troubleshooting) see
+[docs/external-ci-builds.md](../docs/external-ci-builds.md).
+A complete example project is in [example](example).
+
 ## How it works
 
 1. Your existing CI pipeline builds the MPS project (generation, compilation, packaging of plugins, ...).

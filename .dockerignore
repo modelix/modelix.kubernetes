@@ -8,6 +8,7 @@
 /package.json
 /package-lock.json
 /README.md
+/docs
 /skaffold-test.yaml
 /skaffold-build.yaml
 

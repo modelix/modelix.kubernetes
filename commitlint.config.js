@@ -9,6 +9,7 @@ module.exports = {
         "helm",
         "instances-manager",
         "workspace-client",
+        "workspace-gradle-plugin",
         "workspace-job",
         "workspace-manager"
       ],
