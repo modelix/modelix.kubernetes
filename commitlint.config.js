@@ -6,6 +6,7 @@ module.exports = {
       "always",
       [
         "deps",
+        "helm",
         "instances-manager",
         "workspace-client",
         "workspace-job",
