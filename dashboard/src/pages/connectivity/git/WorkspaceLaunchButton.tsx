@@ -30,6 +30,7 @@ import {
 } from "../../../api/workspacesApi.ts";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router";
+import { ArtifactChooser } from "../../workspaces/WorkspaceArtifacts.tsx";
 
 export default function WorkspaceLaunchButton(props: {
   initialGitRepositoryId?: string;
@@ -80,6 +81,7 @@ function WorkspaceLaunchDialogContent(props: {
   );
   const [draftId, setDraftId] = useState<string | undefined>();
   const [workspaceId, setWorkspaceId] = useState<string | undefined>(props.initialWorkspaceId);
+  const [artifactId, setArtifactId] = useState<string | undefined>();
   const navigate = useNavigate();
   const [
     createDraftInRepositoryMutation,
@@ -118,6 +120,7 @@ function WorkspaceLaunchDialogContent(props: {
           drafts: [newOrChosenDraftId],
           enabled: true,
           state: "CREATED",
+          artifactId: artifactId,
         },
       })
     )?.data?.id;
@@ -160,7 +163,10 @@ function WorkspaceLaunchDialogContent(props: {
               repositoryId={repositoryId ?? ""}
               draftId={draftId}
               workspaceId={workspaceId}
-              onChange={(id) => setWorkspaceId(id)}
+              onChange={(id) => {
+                setWorkspaceId(id);
+                setArtifactId(undefined);
+              }}
             />
           ) : (
             <Typography color="textSecondary" sx={{ fontStyle: "italic" }}>
@@ -181,6 +187,18 @@ function WorkspaceLaunchDialogContent(props: {
             <Typography color="textSecondary" sx={{ fontStyle: "italic" }}>
               Choose a workspace first
             </Typography>
+          )}
+          {workspaceId && workspaceQuery.data?.buildMode === "EXTERNAL" && (
+            <>
+              <Typography color="textSecondary" sx={{ gridColumnStart: 1 }}>
+                Artifact
+              </Typography>
+              <ArtifactChooser
+                workspaceId={workspaceId}
+                artifactId={artifactId}
+                onChange={(id) => setArtifactId(id)}
+              />
+            </>
           )}
         </Box>
       </DialogContent>

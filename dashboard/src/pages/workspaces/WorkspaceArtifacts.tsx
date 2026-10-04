@@ -16,19 +16,23 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { CircularProgress } from "@mui/material";
+import { Autocomplete, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ErrorIcon from "@mui/icons-material/Error";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import KeyIcon from "@mui/icons-material/Key";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 /**
  * Results of external (CI) builds that were uploaded with the Gradle plugin org.modelix.workspaces.
  */
 export default function WorkspaceArtifacts({
   workspaceId,
+  onLaunch,
 }: {
   workspaceId: string;
+  /** If specified, each artifact gets a button that launches an instance running it. */
+  onLaunch?: (artifactId: string) => void;
 }): ReactNode {
   const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   return (
@@ -46,7 +50,7 @@ export default function WorkspaceArtifacts({
           </Button>
         }
       />
-      <ArtifactList workspaceId={workspaceId} />
+      <ArtifactList workspaceId={workspaceId} onLaunch={onLaunch} />
       <UploadTokenDialog
         workspaceId={workspaceId}
         open={tokenDialogOpen}
@@ -56,7 +60,13 @@ export default function WorkspaceArtifacts({
   );
 }
 
-function ArtifactList({ workspaceId }: { workspaceId: string }): ReactNode {
+function ArtifactList({
+  workspaceId,
+  onLaunch,
+}: {
+  workspaceId: string;
+  onLaunch?: (artifactId: string) => void;
+}): ReactNode {
   const artifactsQuery = useListArtifactsQuery(
     { workspaceId: workspaceId },
     { pollingInterval: 10000 },
@@ -88,7 +98,7 @@ function ArtifactList({ workspaceId }: { workspaceId: string }): ReactNode {
     <CardContent
       sx={{
         display: "grid",
-        gridTemplateColumns: "max-content 1fr max-content max-content max-content",
+        gridTemplateColumns: "max-content 1fr max-content max-content max-content max-content",
         columnGap: 3,
         rowGap: 1,
         alignItems: "center",
@@ -109,6 +119,15 @@ function ArtifactList({ workspaceId }: { workspaceId: string }): ReactNode {
           <Typography color="textSecondary" fontSize="small">
             {formatSize(artifact.sizeBytes)}
           </Typography>
+          {onLaunch ? (
+            <Tooltip title="Launch an instance running this build">
+              <IconButton onClick={() => onLaunch(artifact.id)}>
+                <RocketLaunchIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <span />
+          )}
           <IconButton
             disabled={deleteResult.isLoading}
             onClick={() =>
@@ -208,6 +227,44 @@ function UploadTokenDialog({
       </DialogActions>
     </Dialog>
   );
+}
+
+/**
+ * Chooses the artifact an instance runs. Without a choice, the workspace-manager picks the build of the draft's
+ * base commit, otherwise the newest build of the draft's branch, otherwise the newest build of the workspace.
+ */
+export function ArtifactChooser(props: {
+  workspaceId: string;
+  artifactId?: string;
+  onChange: (artifactId?: string) => void;
+}): ReactNode {
+  const artifactsQuery = useListArtifactsQuery({ workspaceId: props.workspaceId });
+  const artifacts = artifactsQuery.data?.artifacts ?? [];
+  const selected = artifacts.find((a) => a.id === props.artifactId);
+  return (
+    <Autocomplete<WorkspaceArtifact>
+      sx={{ minWidth: 300 }}
+      value={selected ?? null}
+      onChange={(e, newValue) => props.onChange(newValue?.id)}
+      options={artifacts}
+      getOptionLabel={artifactLabel}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+      renderInput={(params) => (
+        <TextField {...params} placeholder="Automatic (closest to the branch)" />
+      )}
+    />
+  );
+}
+
+function artifactLabel(artifact: WorkspaceArtifact): string {
+  return [
+    new Date(artifact.createdAt).toLocaleString(),
+    artifact.label ?? artifact.id,
+    artifact.gitBranch,
+    artifact.gitCommit?.substring(0, 10),
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function artifactDetails(artifact: WorkspaceArtifact): string {

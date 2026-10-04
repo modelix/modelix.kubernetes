@@ -137,7 +137,9 @@ function WorkspaceCard({
     }
   }
 
-  function launchInstance() {
+  const hasGitRepository = (workspace.gitRepositoryIds ?? []).length > 0;
+
+  function launchInstance(artifactId?: string) {
     newInstanceMutation({
       workspaceInstance: {
         id: "",
@@ -145,6 +147,7 @@ function WorkspaceCard({
         owner: auth.user?.profile?.preferred_username,
         enabled: true,
         state: "CREATED",
+        artifactId: artifactId,
       },
     });
   }
@@ -505,7 +508,11 @@ function WorkspaceCard({
         {workspace.buildMode === "EXTERNAL" && (
           <>
             <Divider />
-            <WorkspaceArtifacts workspaceId={workspace.id} />
+            <WorkspaceArtifacts
+              workspaceId={workspace.id}
+              // with a git repository, an artifact is chosen in the launch dialog together with the draft
+              onLaunch={hasGitRepository ? undefined : (artifactId) => launchInstance(artifactId)}
+            />
           </>
         )}
         <Divider />
@@ -514,13 +521,13 @@ function WorkspaceCard({
           slotProps={{ title: { variant: "h6" } }}
           action={
             <>
-              {(workspace.gitRepositoryIds ?? []).length === 0 ? (
+              {!hasGitRepository ? (
                 // Without a git repository there is no draft to choose
                 <Tooltip title="Launch Workspace">
                   <span>
                     <IconButton
                       disabled={newInstanceResult.isLoading}
-                      onClick={launchInstance}
+                      onClick={() => launchInstance()}
                     >
                       <RocketLaunchIcon />
                     </IconButton>
