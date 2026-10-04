@@ -11,9 +11,9 @@ multi-ecosystem-groups:
   modelix-core:
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 20
 updates:
   - package-ecosystem: "gradle"
-    open-pull-requests-limit: 20
     registries:
       - maven-central
       - maven-itemis
@@ -27,7 +27,6 @@ updates:
       - "org.modelix:model-server"
       - "org.modelix.mps:mps-sync-plugin3"
   - package-ecosystem: "docker"
-    open-pull-requests-limit: 20
     directories:
       - "/"
       - "/helm/modelix"
