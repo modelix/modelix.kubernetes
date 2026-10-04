@@ -1,0 +1,1 @@
+# Makes this directory the pnpm workspace root, so that pnpm doesn't pick up a pnpm-workspace.yaml of a parent directory.

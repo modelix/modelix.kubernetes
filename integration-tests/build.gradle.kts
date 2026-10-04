@@ -12,7 +12,7 @@ dependencies {
     testImplementation(libs.jetty.server)
     testImplementation(libs.jetty.servlet)
     testImplementation(libs.jakarta.servlet.api)
-    testImplementation(libs.modelix.api.client.ktor)
+    testImplementation(project(":openapi:api-client-ktor"))
     testImplementation(libs.modelix.authorization)
     testImplementation(libs.ktor.client.cio)
     testImplementation(libs.ktor.client.content.negotiation)

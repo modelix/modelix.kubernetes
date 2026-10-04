@@ -45,6 +45,16 @@ and [workspace-gradle-plugin/README.md](workspace-gradle-plugin/README.md) for t
 
 This Helm chart is tightly coupled and has to be developed in together with [Modelix Workspace components](https://github.com/modelix/modelix.workspaces).
 
+### REST APIs and the dashboard
+
+- [openapi/specifications](openapi/specifications) contains the OpenAPI specifications of the REST APIs.
+  The Ktor server stubs ([openapi/api-server-stubs-ktor](openapi/api-server-stubs-ktor)) used by the workspace-manager,
+  the Ktor client ([openapi/api-client-ktor](openapi/api-client-ktor)) used by the integration tests
+  and the API clients of the dashboard are generated from them during the build.
+- [dashboard](dashboard) contains the web UI that the proxy serves under `/modelix/dashboard/`.
+  To run it with hot reloading, generate the API clients with `./gradlew :dashboard:generateApis`
+  and then run `pnpm dev` in the `dashboard` directory.
+
 ### Making changes to the Helm chart and OCI images in this repository
 
 1. Set up the project by running:

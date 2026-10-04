@@ -42,3 +42,17 @@ updates:
         patterns:
           - "postgres"
           - "pgautoupgrade/pgautoupgrade"
+  - package-ecosystem: "npm"
+    directories:
+      - "/dashboard"
+      - "/openapi/redocly"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps)"
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"

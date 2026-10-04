@@ -1,0 +1,588 @@
+openapi: "3.1.0"
+info:
+  title: "Modelix Workspaces"
+  version: "1.0.0"
+servers:
+  - url: '/modelix/workspaces'
+    description: modelix-workspaces-manager
+tags:
+  - name: Workspaces
+  - name: Instances
+  - name: Artifacts
+  - name: GitChangeDrafts
+paths:
+
+  /workspaces/:
+    get:
+      operationId: listWorkspaces
+      tags: [Workspaces]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceList' }
+    post:
+      operationId: createWorkspace
+      tags: [Workspaces]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceConfig'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceConfig' }
+
+  /workspaces/{workspaceId}:
+    get:
+      operationId: getWorkspace
+      tags: [Workspaces]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceConfig' }
+    put:
+      operationId: updateWorkspace
+      tags: [Workspaces]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceConfig'
+      responses:
+        '200':
+          description: OK
+    delete:
+      operationId: deleteWorkspace
+      tags: [Workspaces]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /workspaces/{workspaceId}/artifacts/:
+    get:
+      operationId: listArtifacts
+      summary: List the artifacts that were uploaded for a workspace, newest first.
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceArtifactList' }
+
+  /workspaces/{workspaceId}/artifacts/upload:
+    post:
+      operationId: uploadArtifact
+      summary: Upload the result of an external (CI) build of the workspace.
+      description: |
+        The request body is a ZIP file with the following layout:
+        - `modelix-artifact.json`: optional manifest (see WorkspaceArtifactManifest)
+        - `mps-projects/<name>/`: MPS projects that are opened in the workspace instance
+        - `mps-languages/`: additional modules that are available as a global library
+        - `mps-plugins/`: IDEA/MPS plugins (folders or ZIP files) that are installed before MPS starts
+
+        Requires the permission `workspaces/workspace/<id>/build-result/write`.
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/zip:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceArtifact' }
+        '400':
+          description: The uploaded file is not a valid artifact.
+        '413':
+          description: The uploaded file is too large.
+
+  /workspaces/{workspaceId}/artifacts/{artifactId}:
+    get:
+      operationId: getArtifact
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceArtifact' }
+    delete:
+      operationId: deleteArtifact
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /workspaces/{workspaceId}/artifacts/{artifactId}/content.zip:
+    get:
+      operationId: downloadArtifact
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+
+  /workspaces/{workspaceId}/artifact-upload-token:
+    post:
+      operationId: createArtifactUploadToken
+      summary: Create an access token that a CI pipeline can use to upload artifacts for this workspace.
+      tags: [Artifacts]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtifactUploadTokenRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArtifactUploadToken' }
+
+  /tasks/{taskId}/config:
+    get:
+      operationId: getWorkspaceByTaskId
+      tags: [Workspaces]
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: object }
+
+  /tasks/{taskId}/context.tar.gz:
+    get:
+      operationId: getContextForTaskId
+      tags: [Workspaces]
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/gzip:
+              schema:
+                type: string
+                format: binary
+
+  /instances/:
+    get:
+      operationId: listInstances
+      tags: [Instances]
+      parameters:
+        - name: workspaceId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceInstanceList' }
+    post:
+      operationId: createInstance
+      tags: [Instances]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceInstance'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceInstance' }
+
+  /instances/{instanceId}/:
+    get:
+      operationId: getInstance
+      tags: [Instances]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceInstance' }
+    delete:
+      operationId: deleteInstance
+      tags: [Instances]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+
+
+  /instances/{instanceId}/state:
+    get:
+      operationId: getInstanceState
+      tags: [Workspaces]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceInstanceStateObject'
+    post:
+      operationId: changeInstanceState
+      tags: [Workspaces]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceInstanceStateObject'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceInstanceStateObject'
+
+  /instances/{instanceId}/enabled:
+    put:
+      operationId: enableInstance
+      tags: [Instances]
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceInstanceEnabled'
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    WorkspaceList:
+      type: object
+      required: [workspaces]
+      properties:
+        workspaces: { type: array, items: { $ref: '#/components/schemas/WorkspaceConfig' } }
+
+    WorkspaceConfig:
+      type: object
+      required: [id, name, mpsVersion]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        mpsVersion: { type: string }
+        memoryLimit: { type: string }
+        gitRepositoryIds: { type: array, items: { type: string } }
+        mavenRepositories:
+          type: array
+          items: { $ref: '#/components/schemas/MavenRepository' }
+        mavenArtifacts:
+          type: array
+          items: { $ref: '#/components/schemas/MavenArtifact' }
+        buildConfig: { $ref: '#/components/schemas/WorkspaceBuildConfig' }
+        runConfig: { $ref: '#/components/schemas/WorkspaceRunConfig' }
+        buildMode: { $ref: '#/components/schemas/WorkspaceBuildMode' }
+
+    WorkspaceBuildMode:
+      type: string
+      description: |
+        IN_CLUSTER: The workspace is built inside the cluster from the configured git repositories and maven artifacts.
+        EXTERNAL: The workspace is built by an external CI pipeline that uploads the result as an artifact.
+        If not specified, IN_CLUSTER is used.
+      enum: [IN_CLUSTER, EXTERNAL]
+
+    MavenRepository:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string }
+        hasCredentials:
+          type: boolean
+        credentials:
+          $ref: '#/components/schemas/MavenCredentials'
+
+    MavenCredentials:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+
+    MavenArtifact:
+      type: object
+      required: [groupId, artifactId]
+      properties:
+        groupId: { type: string }
+        artifactId: { type: string }
+        version: { type: string }
+
+    GitRepository:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string }
+        credentials: { $ref: '#/components/schemas/GitCredentials' }
+
+    GitCredentials:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+
+    WorkspaceInstanceList:
+      type: object
+      required: [instances]
+      properties:
+        instances: { type: array, items: { $ref: '#/components/schemas/WorkspaceInstance' } }
+
+    WorkspaceInstance:
+      type: object
+      required: [id, config, state, enabled]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        config: { $ref: '#/components/schemas/WorkspaceConfig' }
+        drafts: { type: array, items: { type: string, format: uuid } }
+        owner: { type: string }
+        enabled: { type: boolean }
+        state: { $ref: '#/components/schemas/WorkspaceInstanceState' }
+        statusText: { type: string }
+        readonly: { type: boolean }
+        artifactId:
+          type: string
+          description: |
+            Only used if the build mode of the workspace is EXTERNAL.
+            Runs this specific artifact. If not specified, the artifact that was built from the base commit of the
+            draft is used, or the newest artifact if there is no draft.
+
+    WorkspaceInstanceState:
+      type: string
+      enum: [UNKNOWN, CREATED, DISABLED, WAITING_FOR_BUILD, BUILD_FAILED, LAUNCHING, RUNNING]
+
+    WorkspaceInstanceStateObject:
+      type: object
+      required: [state]
+      properties:
+        state: { $ref: '#/components/schemas/WorkspaceInstanceState' }
+
+    WorkspaceInstanceEnabled:
+      type: object
+      required: [enabled]
+      properties:
+        enabled: { type: boolean }
+
+    WorkspaceBuildConfig:
+      type: object
+      required: [ignoredModules, additionalGenerationDependencies]
+      properties:
+        ignoredModules: { type: array, items: { type: string } }
+        additionalGenerationDependencies:
+          type: array
+          items: { $ref: '#/components/schemas/GenerationDependency' }
+
+    GenerationDependency:
+      type: object
+      required: [from, to]
+      properties:
+        from: { type: string }
+        to: { type: string }
+
+    WorkspaceRunConfig:
+      type: object
+      required: [loadUsedModulesOnly, memoryLimit]
+      properties:
+        loadUsedModulesOnly: { type: boolean }
+        memoryLimit: { type: string }
+
+    WorkspaceArtifactList:
+      type: object
+      required: [artifacts]
+      properties:
+        artifacts: { type: array, items: { $ref: '#/components/schemas/WorkspaceArtifact' } }
+
+    WorkspaceArtifact:
+      type: object
+      required: [id, workspaceId, createdAt, sizeBytes, sha256]
+      properties:
+        id: { type: string }
+        workspaceId: { type: string }
+        createdAt:
+          type: string
+          description: ISO-8601 timestamp of the upload
+        sizeBytes:
+          type: integer
+          format: int64
+        sha256: { type: string }
+        uploadedBy: { type: string }
+        mpsVersion: { type: string }
+        gitCommit: { type: string }
+        gitBranch: { type: string }
+        label: { type: string }
+
+    WorkspaceArtifactManifest:
+      type: object
+      description: Content of the file `modelix-artifact.json` inside an uploaded artifact.
+      required: [formatVersion]
+      properties:
+        formatVersion:
+          type: integer
+          description: Currently always 1.
+        mpsVersion:
+          type: string
+          description: Major MPS version (e.g. 2024.1) the artifact was built with. Overrides the MPS version of the workspace.
+        gitCommit: { type: string }
+        gitBranch: { type: string }
+        label:
+          type: string
+          description: Free text, e.g. a version number or build number of the CI pipeline.
+
+    ArtifactUploadTokenRequest:
+      type: object
+      properties:
+        validityDays:
+          type: integer
+          description: Number of days the token is valid. Defaults to 90.
+
+    ArtifactUploadToken:
+      type: object
+      required: [token, expiresAt]
+      properties:
+        token: { type: string }
+        expiresAt:
+          type: string
+          description: ISO-8601 timestamp
+
+  securitySchemes:
+    modelixJwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - modelixJwtAuth: []
