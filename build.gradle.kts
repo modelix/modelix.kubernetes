@@ -39,13 +39,9 @@ subprojects {
     }
 }
 
-val dashboard by configurations.creating
-dependencies {
-    dashboard(libs.modelix.dashboard)
-}
-
 val copyDashboard by tasks.registering(Sync::class) {
-    from(zipTree({ dashboard.singleFile }))
+    dependsOn(":dashboard:pnpm_run_build")
+    from(project(":dashboard").layout.projectDirectory.dir("dist"))
     into(layout.projectDirectory.dir("proxy/dashboard"))
 }
 

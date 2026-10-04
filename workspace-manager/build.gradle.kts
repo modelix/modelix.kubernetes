@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.zt.zip)
     implementation(project(":gitui"))
     implementation(project(":workspaces"))
-    implementation(libs.modelix.api.server.stubs)
+    implementation(project(":openapi:api-server-stubs-ktor"))
     mpsPlugins(libs.bundles.modelix.mpsPlugins.all)
     mpsPlugins(project(":workspace-client-plugin", configuration = "pluginZip"))
     runtimeOnly(libs.slf4j.simple)

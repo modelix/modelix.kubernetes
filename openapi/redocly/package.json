@@ -1,0 +1,10 @@
+{
+  "name": "modelix-openapi",
+  "private": true,
+  "dependencies": {
+    "@redocly/cli": "^2.57.0"
+  },
+  "scripts": {
+    "bundle": "redocly bundle"
+  }
+}

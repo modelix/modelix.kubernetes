@@ -13,8 +13,7 @@ tasks.withType<Jar> {
     archiveFileName.set("keycloak-extensions.jar")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+tasks.withType<JavaCompile> {
+    // Compiled with the JDK running Gradle, which has to be at least 21 for other projects in this build.
+    options.release.set(17)
 }

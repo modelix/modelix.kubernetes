@@ -26,8 +26,12 @@ pluginManagement {
 
 rootProject.name = "modelix.kubernetes"
 
+include("dashboard")
 include("integration-tests")
 include("keycloak-extensions")
+include("openapi:api-client-ktor")
+include("openapi:api-server-stubs-ktor")
+include("openapi:redocly")
 
 include("gitui")
 include("workspace-client-plugin")

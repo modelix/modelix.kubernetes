@@ -20,4 +20,7 @@
 /node_modules
 /build
 /*/build
+/openapi/*/build
+**/node_modules
+/dashboard/dist
 **/.kotlin
