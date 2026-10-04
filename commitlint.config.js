@@ -5,9 +5,11 @@ module.exports = {
       2,
       "always",
       [
+        "dashboard",
         "deps",
         "helm",
         "instances-manager",
+        "openapi",
         "workspace-client",
         "workspace-gradle-plugin",
         "workspace-job",
