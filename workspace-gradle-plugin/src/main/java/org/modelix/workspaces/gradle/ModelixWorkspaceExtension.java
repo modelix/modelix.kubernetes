@@ -19,6 +19,7 @@ import javax.inject.Inject;
  *     mpsVersion = "2024.1"
  *     accessToken = providers.environmentVariable("MODELIX_ACCESS_TOKEN")
  *
+ *     dependsOn("build")
  *     mpsProject("my-project", layout.projectDirectory.dir("mps"))
  *     languages { from(layout.buildDirectory.dir("dependencies")) }
  *     plugins { from(layout.buildDirectory.dir("plugins")) }
@@ -97,6 +98,22 @@ public abstract class ModelixWorkspaceExtension {
 
     void setPackageTask(TaskProvider<Zip> packageTask) {
         this.packageTask = packageTask;
+    }
+
+    /**
+     * Tasks that have to run before the artifact is packaged, usually the task that generates and compiles
+     * the MPS project. This avoids referencing the tasks of the plugin by name.
+     * Accepts the same arguments as {@link org.gradle.api.Task#dependsOn(Object...)}:
+     * task names, tasks, task providers, ...
+     *
+     * <pre>
+     * modelixWorkspace {
+     *     dependsOn("build")
+     * }
+     * </pre>
+     */
+    public void dependsOn(Object... paths) {
+        packageTask.configure(zip -> zip.dependsOn(paths));
     }
 
     /**

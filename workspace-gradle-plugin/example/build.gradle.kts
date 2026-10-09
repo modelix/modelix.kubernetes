@@ -34,11 +34,8 @@ modelixWorkspace {
     workspaceId = providers.gradleProperty("modelix.workspaceId")
     mpsVersion = mpsReleaseVersion.substringBeforeLast(".")
 
-    mpsProject("git-import-test-repo", layout.projectDirectory.dir("mps"))
-}
-
-tasks.named("packageModelixWorkspaceArtifact") {
     dependsOn("assembleMpsModules")
+    mpsProject("git-import-test-repo", layout.projectDirectory.dir("mps"))
 }
 
 tasks.named<Delete>("clean") {
