@@ -55,6 +55,12 @@ data:
               containerPort: 33334
             - name: "generator"
               containerPort: 33335
+            - name: "text-editor"
+              containerPort: 43593
+            - name: "web-editor"
+              containerPort: 43595
+            - name: "image-editor"
+              containerPort: 43596
             {{- range $index, $port := .Values.workspaces.client.customExposedPorts }}
             - name: "custom-port-{{ $index }}"
               containerPort: {{ $port }}
@@ -106,6 +112,15 @@ data:
         - name: "generator"
           port: 33335
           targetPort: "generator"
+        - name: "text-editor"
+          port: 43593
+          targetPort: "text-editor"
+        - name: "web-editor"
+          port: 43595
+          targetPort: "web-editor"
+        - name: "image-editor"
+          port: 43596
+          targetPort: "image-editor"
         - name: "jvmdebug"
           port: 5071
           targetPort: "jvmdebug"
