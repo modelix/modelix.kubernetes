@@ -42,6 +42,7 @@ import Stack from "@mui/material/Stack";
 import mpsIcon from "../../assets/images/mps-logo.png";
 import { useNavigate } from "react-router";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import WorkspaceLaunchButton from "../connectivity/git/WorkspaceLaunchButton.tsx";
 import {useListGitRepositoriesQuery} from "../../api/gitConnectorApi.ts";
 import ListEditor from "../../components/ListEditor.tsx";
@@ -621,6 +622,16 @@ function InstanceComponent({ instance }: { instance: WorkspaceInstance }) {
             target="_blank"
           >
             <img alt="MPS" src={mpsIcon} width="16px" height="16px" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Open Web Editor">
+          <IconButton
+            disabled={!ready}
+            sx={{ opacity: ready ? "100%" : "50%" }}
+            href={`${window.location.protocol}//${window.location.host}/workspace-instances/${instance.id}/port/43595/`}
+            target="_blank"
+          >
+            <EditNoteIcon fontSize="small" />
           </IconButton>
         </Tooltip>
         <IconButton
