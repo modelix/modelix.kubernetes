@@ -17,6 +17,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -178,6 +179,20 @@ class ModelixWorkspacesPluginTest {
 
         Path resultFile = projectDir.resolve("build/modelix/published-artifact.json");
         assertTrue(Files.readString(resultFile).contains("artifact-1"));
+    }
+
+    @Test
+    void dependsOnRunsTasksBeforePackaging() throws IOException {
+        writeProject("    dependsOn('generateDeps')");
+        Files.writeString(projectDir.resolve("build.gradle"), String.join("\n",
+            "tasks.register('generateDeps') {",
+            "    doLast { file('deps/generated.jar').text = 'jar' }",
+            "}",
+            ""), StandardOpenOption.APPEND);
+        BuildResult result = runner(ciEnv("MODELIX_ACCESS_TOKEN", "my-token"), "publishModelixWorkspaceArtifact").build();
+
+        assertEquals(TaskOutcome.SUCCESS, result.task(":generateDeps").getOutcome());
+        assertNotNull(unzip(uploadRequest().body()).get("mps-languages/generated.jar"));
     }
 
     @Test

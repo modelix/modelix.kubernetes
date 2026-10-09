@@ -48,6 +48,9 @@ modelixWorkspace {
     workspaceId = "6f1d2c3e-..." // shown in the URL of the workspace in the dashboard
     mpsVersion = "2024.1"        // major MPS version the project was built with
 
+    // Whatever task generates and compiles your MPS project. Runs before the artifact is packaged.
+    dependsOn("build")
+
     // Opened as a project in MPS. Paths are relative to the folder containing the .mps folder.
     mpsProject("my-project", layout.projectDirectory.dir("mps"))
 
@@ -56,10 +59,6 @@ modelixWorkspace {
 
     // Optional: IDEA/MPS plugins (folders or ZIP files) that are installed before MPS starts
     plugins { from(layout.buildDirectory.dir("plugins")) }
-}
-
-tasks.named("publishModelixWorkspaceArtifact") {
-    dependsOn("build") // whatever task builds your MPS project
 }
 ```
 
