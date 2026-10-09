@@ -38,13 +38,3 @@ subprojects {
         mavenCentral()
     }
 }
-
-val copyDashboard by tasks.registering(Sync::class) {
-    dependsOn(":dashboard:pnpm_run_build")
-    from(project(":dashboard").layout.projectDirectory.dir("dist"))
-    into(layout.projectDirectory.dir("proxy/dashboard"))
-}
-
-tasks.assemble {
-    dependsOn(copyDashboard)
-}

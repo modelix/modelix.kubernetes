@@ -1,0 +1,23 @@
+# Used instead of the root .dockerignore when building proxy/Dockerfile.
+# Skaffold also uses it to decide which file changes trigger a rebuild of the image.
+*
+
+!proxy/Caddyfile
+!proxy/index.html
+!proxy/public
+
+!openapi/specifications
+!openapi/redocly
+openapi/redocly/build
+openapi/redocly/node_modules
+
+!dashboard
+dashboard/node_modules
+dashboard/dist
+dashboard/build
+dashboard/.gradle
+dashboard/src/api/workspacesApi.ts
+dashboard/src/api/gitConnectorApi.ts
+dashboard/src/api/mavenConnectorApi.ts
+
+**/.DS_Store
