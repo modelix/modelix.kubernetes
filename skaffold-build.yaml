@@ -3,7 +3,9 @@
 apiVersion: skaffold/v4beta11
 kind: Config
 build:
-  local: {}
+  local:
+    # proxy/Dockerfile uses $BUILDPLATFORM, which the legacy builder doesn't set
+    useBuildkit: true
   platforms: ["linux/amd64", "linux/arm64"]
   artifacts:
     - image: modelix-proxy
