@@ -169,7 +169,11 @@ db:
   user: "modelix"
   password: "modelix"
   db: "modelix"
-  storage: 3000Mi
+  # Size of the PersistentVolumeClaim of the database.
+  # If empty, new installations get 20Gi and existing installations keep the size of their existing claim,
+  # because increasing it fails if the StorageClass doesn't allow volume expansion.
+  # Set it explicitly if your deployment tool doesn't support Helm's `lookup` function (e.g. Argo CD).
+  storage: ""
 
 postgres:
   image:

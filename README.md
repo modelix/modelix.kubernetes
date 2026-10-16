@@ -143,6 +143,12 @@ Users can log in with an external OpenID Connect or SAML identity provider (e.g.
 in `keycloak.identityProviders`. See [values.yaml](helm/modelix/values.yaml) for an example.
 The client secret is read from a Kubernetes Secret.
 
+### Database size
+
+The PersistentVolumeClaim of the database is 20Gi for new installations.
+Existing installations keep their size, unless `db.storage` is set.
+Increasing it requires a StorageClass that allows volume expansion.
+
 ### Node Pools
 
 If you are using a cloud provider that supports auto-scaling create a separate node pool for the MPS instances.
