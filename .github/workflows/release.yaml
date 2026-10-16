@@ -1,31 +1,48 @@
 name: Release
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *' # run at 2 AM UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
 
 jobs:
   release:
-    name: Run semantic release
+    name: Run release-please
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # to be able to publish a GitHub release
     if: ${{ github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      # Keeps a release PR up to date that bumps the version in helm/modelix/Chart.yaml and updates the CHANGELOG.md.
+      # Merging that PR creates the tag and the GitHub release.
+      #
+      # The default GITHUB_TOKEN doesn't trigger other workflows. Therefore, the tag doesn't trigger publish.yml
+      # and the publishing is started by the next job.
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
         with:
-          fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
-      - name: Setup Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          node-version: "lts/*"
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm clean-install
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+  publish:
+    name: Publish
+    needs: release
+    if: ${{ needs.release.outputs.release_created == 'true' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ needs.release.outputs.tag_name }}
+    secrets: inherit

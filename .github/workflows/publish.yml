@@ -1,16 +1,31 @@
 name: Publish
 
 on:
+  # Releases are published by release.yaml, which calls this workflow. Tags created by release-please with the default
+  # GITHUB_TOKEN don't trigger the push event. The push event is still useful for tags that are pushed manually.
   push:
     tags:
       - '**'
+  workflow_call:
+    inputs:
+      tag:
+        description: The tag of the release to publish.
+        required: true
+        type: string
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
@@ -26,7 +41,7 @@ jobs:
           package_json_file: dashboard/package.json
 
       - name: Use tag as version
-        run: echo "${GITHUB_REF#refs/*/}" > version.txt
+        run: echo "$VERSION" > version.txt
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1 # v3
@@ -66,7 +81,7 @@ jobs:
             skaffold
           skaffold: 2.15.0
       - name: Build and Push Images
-        run: skaffold build --filename='skaffold-build.yaml' --push --default-repo="docker.io/modelix" --tag="${GITHUB_REF#refs/*/}"
+        run: skaffold build --filename='skaffold-build.yaml' --push --default-repo="docker.io/modelix" --tag="$VERSION"
 
       - name: Publish Helm Chart
         env:

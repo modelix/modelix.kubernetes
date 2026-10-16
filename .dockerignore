@@ -3,10 +3,7 @@
 /proxy
 /helm
 /.gitignore
-/.releaserc.yaml
 /version.txt
-/package.json
-/package-lock.json
 /README.md
 /docs
 /skaffold-test.yaml
