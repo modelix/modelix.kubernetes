@@ -15,8 +15,8 @@ type: application
 # The chart version and the app version are always the version of the latest release.
 # They are updated by release-please (see release-please-config.json). Don't change them manually.
 # Image tags default to the chart version. A checkout of a release tag therefore uses the images of that release.
-version: "1.6.0" # x-release-please-version
+version: "1.7.0" # x-release-please-version
 
-appVersion: "1.6.0" # x-release-please-version
+appVersion: "1.7.0" # x-release-please-version
 
 dependencies: []
