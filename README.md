@@ -126,6 +126,22 @@ After Modelix is deployed, make sure to change the password of the admin account
 - The default password for the user **admin** is **modelix**.
 - Navigate to Edit > Credentials > Reset Password
 - Enter a new password and disable *Temporary*
+- Set `keycloak.adminPassword` to the new password in your Helm values.
+  The Job that applies the realm configuration after each `helm upgrade` logs in with it.
+
+### Keycloak realm
+
+Keycloak imports [keycloak-realm.json](helm/modelix/keycloak-realm.json) only when the realm doesn't exist yet.
+After each `helm install` and `helm upgrade`, a Job runs [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli)
+to apply the Modelix roles and clients of that file to an existing realm, so that changes of newer chart versions
+reach existing installations. Nothing is deleted.
+It can be disabled with `keycloak.realmSync.enabled: false`.
+
+### Login with an external identity provider
+
+Users can log in with an external OpenID Connect or SAML identity provider (e.g. ADFS or Entra ID) that is configured
+in `keycloak.identityProviders`. See [values.yaml](helm/modelix/values.yaml) for an example.
+The client secret is read from a Kubernetes Secret.
 
 ### Node Pools
 

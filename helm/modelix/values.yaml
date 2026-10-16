@@ -62,6 +62,61 @@ keycloak:
     repository: modelix/modelix-keycloak
     tag: ""
     pullPolicy: IfNotPresent
+  # Keycloak imports keycloak-realm.json only if the realm doesn't exist yet. Without this synchronization, changes of a
+  # newer chart version and the `identityProviders` below don't reach an existing installation.
+  # After each `helm install` and `helm upgrade`, a Job applies the Modelix roles and clients of keycloak-realm.json and
+  # the `identityProviders` to the realm. Changes made to them in the Keycloak admin console may be overwritten.
+  # Nothing is deleted. Roles, clients and identity providers that are removed from the configuration have to be
+  # deleted manually.
+  realmSync:
+    enabled: true
+    image:
+      repository: adorsys/keycloak-config-cli
+      tag: 6.5.1-26.5.5@sha256:0955d98c8a341898b7aa177477edf8a1e90569ae50bbe7598141c1270b773274
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: "300Mi"
+        cpu: "0.1"
+      limits:
+        memory: "300Mi"
+        cpu: "1.0"
+  # External identity providers users can log in with (identity brokering), e.g. ADFS, Entra ID or another Keycloak.
+  # Requires `realmSync.enabled`.
+  # Each entry is a Keycloak IdentityProviderRepresentation
+  # (https://www.keycloak.org/docs-api/latest/rest-api/index.html#IdentityProviderRepresentation),
+  # except for `clientSecret` and `mappers`.
+  # Register https://<ingress.hostname>/realms/<keycloak.realm>/broker/<alias>/endpoint as the redirect URI at the
+  # identity provider.
+  identityProviders: []
+  #  - alias: adfs
+  #    displayName: "Company account"
+  #    providerId: oidc
+  #    config:
+  #      issuer: https://sts.example.com/adfs
+  #      authorizationUrl: https://sts.example.com/adfs/oauth2/authorize/
+  #      tokenUrl: https://sts.example.com/adfs/oauth2/token/
+  #      logoutUrl: https://sts.example.com/adfs/oauth2/logout
+  #      userInfoUrl: https://sts.example.com/adfs/userinfo
+  #      jwksUrl: https://sts.example.com/adfs/discovery/keys
+  #      useJwksUrl: true
+  #      validateSignature: true
+  #      clientId: modelix
+  #      clientAuthMethod: client_secret_post
+  #      defaultScope: openid profile email
+  #      syncMode: IMPORT
+  #    # Read from an existing Kubernetes Secret. Don't put the secret into `config`.
+  #    clientSecret:
+  #      secretName: adfs-client
+  #      secretKey: client-secret
+  #    # IdentityProviderMapperRepresentations. The identityProviderAlias is set automatically.
+  #    mappers:
+  #      - name: admins
+  #        identityProviderMapper: oidc-advanced-role-idp-mapper
+  #        config:
+  #          syncMode: FORCE
+  #          claims: '[{"key":"groups","value":"modelix-admins"}]'
+  #          role: modelix-admin
 
 workspaces:
   enabled: true

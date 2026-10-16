@@ -114,6 +114,96 @@ https://{{ .Values.ingress.hostname }}{{ if .Values.ingress.port }}:{{ .Values.i
 http://{{ include "modelix.fullname" . }}-keycloak:8080/
 {{- end }}
 
+{{- define "modelix.keycloakIdentityProviderSecretEnv" -}}
+KEYCLOAK_IDP_{{ . }}_CLIENT_SECRET
+{{- end }}
+
+{{/*
+The part of keycloak-realm.json that is applied to an existing realm by keycloak-config-cli (see keycloak-realm-sync.yaml),
+plus the identity providers from the values.
+It contains only the roles and clients of Modelix. The resources that Keycloak creates for every realm (built-in clients,
+authentication flows, keys, ...) are left alone. IDs are removed, because the realm may have been created with other IDs.
+*/}}
+{{- define "modelix.keycloakRealmSyncConfig" -}}
+{{- $realm := .Files.Get "keycloak-realm.json" | fromJson }}
+{{- $builtInClients := list "account" "account-console" "admin-cli" "broker" "realm-management" "security-admin-console" }}
+{{- $builtInRoles := list "offline_access" "uma_authorization" }}
+
+{{- $clients := list }}
+{{- $clientIds := list }}
+{{- range $realm.clients }}
+{{- if not (has .clientId $builtInClients) }}
+{{- $client := omit . "id" }}
+{{- if eq (toString .secret) "${REALM_CLIENT_SECRET}" }}
+{{- $_ := set $client "secret" "$(env:REALM_CLIENT_SECRET)" }}
+{{- end }}
+{{- if .protocolMappers }}
+{{- $mappers := list }}
+{{- range .protocolMappers }}
+{{- $mappers = append $mappers (omit . "id") }}
+{{- end }}
+{{- $_ := set $client "protocolMappers" $mappers }}
+{{- end }}
+{{- $clients = append $clients $client }}
+{{- $clientIds = append $clientIds .clientId }}
+{{- end }}
+{{- end }}
+
+{{- $realmRoles := list }}
+{{- range $realm.roles.realm }}
+{{- if not (has .name $builtInRoles) }}
+{{- $realmRoles = append $realmRoles (omit . "id" "containerId") }}
+{{- end }}
+{{- end }}
+{{- $clientRoles := dict }}
+{{- range $clientId, $roles := $realm.roles.client }}
+{{- if and $roles (has $clientId $clientIds) }}
+{{- $converted := list }}
+{{- range $roles }}
+{{- $converted = append $converted (omit . "id" "containerId") }}
+{{- end }}
+{{- $_ := set $clientRoles $clientId $converted }}
+{{- end }}
+{{- end }}
+
+{{- $result := dict "realm" $realm.realm "enabled" true "roles" (dict "realm" $realmRoles "client" $clientRoles) "clients" $clients }}
+
+{{- $identityProviders := list }}
+{{- $identityProviderMappers := list }}
+{{- range $index, $idp := .Values.keycloak.identityProviders }}
+{{- $alias := required (printf "keycloak.identityProviders[%d].alias is required" $index) $idp.alias }}
+{{- $rep := omit $idp "clientSecret" "mappers" }}
+{{- if not (hasKey $rep "enabled") }}
+{{- $_ := set $rep "enabled" true }}
+{{- end }}
+{{- /* Keycloak expects all config values to be strings */}}
+{{- $config := dict }}
+{{- range $key, $value := ($idp.config | default dict) }}
+{{- $_ := set $config $key (toString $value) }}
+{{- end }}
+{{- if $idp.clientSecret }}
+{{- $_ := set $config "clientSecret" (printf "$(env:%s)" (include "modelix.keycloakIdentityProviderSecretEnv" $index)) }}
+{{- end }}
+{{- $_ := set $rep "config" $config }}
+{{- $identityProviders = append $identityProviders $rep }}
+{{- range ($idp.mappers | default list) }}
+{{- $mapperConfig := dict }}
+{{- range $key, $value := (.config | default dict) }}
+{{- $_ := set $mapperConfig $key (toString $value) }}
+{{- end }}
+{{- $identityProviderMappers = append $identityProviderMappers (merge (dict "identityProviderAlias" $alias "config" $mapperConfig) (omit . "config")) }}
+{{- end }}
+{{- end }}
+{{- if $identityProviders }}
+{{- $_ := set $result "identityProviders" $identityProviders }}
+{{- end }}
+{{- if $identityProviderMappers }}
+{{- $_ := set $result "identityProviderMappers" $identityProviderMappers }}
+{{- end }}
+
+{{- $result | toPrettyJson }}
+{{- end }}
+
 {{- define "modelix.authorizationConfig" -}}
 - name: MODELIX_JWK_URI_KEYCLOAK
   value: "{{ include "modelix.internalKeycloakUrl" . }}realms/{{ .Values.keycloak.realm }}/protocol/openid-connect/certs"
