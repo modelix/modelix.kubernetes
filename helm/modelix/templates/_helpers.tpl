@@ -62,6 +62,39 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 
+{{/*
+Full reference of a container image, rewritten to use the configured registry mirrors.
+Images without a registry host (Docker Hub) are prefixed with `dockerProxy.prefix`.
+Images of other registries are rewritten if `dockerProxy.registryMirrors` contains their registry host.
+
+Parameters:
+- root: the root context
+- image: a dict with `repository` and an optional `tag`
+- defaultTag: used if the image has no tag (optional)
+*/}}
+{{- define "modelix.image" -}}
+{{- $proxy := .root.Values.dockerProxy }}
+{{- $tag := .image.tag | default .defaultTag }}
+{{- $name := .image.repository }}
+{{- if $tag }}
+{{- $name = printf "%s:%s" $name $tag }}
+{{- end }}
+{{- $parts := splitn "/" 2 $name }}
+{{- $host := $parts._0 }}
+{{- if and $parts._1 (or (contains "." $host) (contains ":" $host) (eq $host "localhost")) }}
+{{- $mirror := get ($proxy.registryMirrors | default dict) $host }}
+{{- if $mirror }}
+{{- printf "%s/%s" (trimSuffix "/" $mirror) $parts._1 }}
+{{- else if and $proxy.prefix (eq $host "docker.io") }}
+{{- printf "%s%s" $proxy.prefix $parts._1 }}
+{{- else }}
+{{- $name }}
+{{- end }}
+{{- else }}
+{{- printf "%s%s" $proxy.prefix $name }}
+{{- end }}
+{{- end }}
+
 {{- define "modelix.serviceAccountName" -}}
 {{- if .Values.serviceAccount -}}
 {{- .Values.serviceAccount -}}
@@ -107,5 +140,20 @@ PGDATA is set explicitly to keep using the existing data directory of deployment
 {{- if .Values.httpProxy }}
 - name: MODELIX_HTTP_PROXY
   value: "{{ .Values.httpProxy }}"
+{{- end }}
+{{- end }}
+
+
+{{/*
+Address (host:port) from which the kubelet pulls images from the internal docker registry.
+*/}}
+{{- define "modelix.internalDockerRegistry.pullAddress" -}}
+{{- $registry := .Values.internalDockerRegistry }}
+{{- if $registry.pullAddress }}
+{{- $registry.pullAddress }}
+{{- else if eq $registry.service.type "NodePort" }}
+{{- printf "localhost:%d" (int $registry.nodePort) }}
+{{- else }}
+{{- fail (printf "internalDockerRegistry.pullAddress is required if internalDockerRegistry.service.type is %s" $registry.service.type) }}
 {{- end }}
 {{- end }}

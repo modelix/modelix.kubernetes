@@ -32,7 +32,7 @@ spec:
           - name: "KUBERNETES_NAMESPACE"
             value: {{ .Release.Namespace }}
           - name: "WORKSPACE_JOB_IMAGE"
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.job.image.repository }}:{{ .Values.workspaces.job.image.tag | default .Chart.Version }}"
+            value: "{{ include "modelix.image" (dict "root" . "image" .Values.workspaces.job.image "defaultTag" .Chart.Version) }}"
           - name: "KUBERNETES_PREFIX"
             value: "{{ include "modelix.fullname" . }}-"
           - name: MODELIX_MAX_BODY_SIZE
@@ -44,7 +44,7 @@ spec:
           - name: MPS_BASEIMAGE_VERSION
             value: {{ .Values.versions.modelix.vncBaseImage }}
           - name: MPS_BASEIMAGE_NAME
-            value: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage"
+            value: "{{ include "modelix.image" (dict "root" . "image" (dict "repository" "modelix/mps-vnc-baseimage")) }}"
           - name: DOCKER_REGISTRY_SERVICE_NAME
             value: "{{ include "modelix.fullname" . }}-docker-registry"
           {{- if .Values.dockerProxy.secret64 }}
@@ -62,7 +62,7 @@ spec:
           - name: WORKSPACE_DOCKER_REGISTRY
             value: localhost:5000
           - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
-            value: "localhost:{{ .Values.internalDockerRegistry.nodePort }}"
+            value: "{{ include "modelix.internalDockerRegistry.pullAddress" . }}"
           - name: INTERNAL_DOCKER_REGISTRY_USER
             valueFrom:
               secretKeyRef:
@@ -82,10 +82,10 @@ spec:
           - name: WORKSPACE_ARTIFACTS_MAX_PER_WORKSPACE
             value: "{{ .Values.workspaces.artifacts.maxArtifactsPerWorkspace }}"
           - name: GIT_IMPORT_IMAGE
-            value: "{{ .Values.dockerProxy.prefix }}{{ .Values.gitImport.image.repository }}:{{ .Values.gitImport.image.tag }}"
+            value: "{{ include "modelix.image" (dict "root" . "image" .Values.gitImport.image) }}"
           {{- include "modelix.authorizationConfig" . | nindent 10 }}
           {{- include "modelix.commonVariables" . | nindent 10 }}
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.workspaces.manager.image.repository }}:{{ .Values.workspaces.manager.image.tag | default .Chart.Version }}"
+        image: "{{ include "modelix.image" (dict "root" . "image" .Values.workspaces.manager.image "defaultTag" .Chart.Version) }}"
         imagePullPolicy: {{ .Values.workspaces.manager.image.pullPolicy }}
         name: workspace-manager
         ports:

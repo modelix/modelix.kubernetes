@@ -1,15 +1,46 @@
-{{ if not .Values.serviceAccount }}
-kind: ClusterRoleBinding
+{{- if .Values.rbac.create }}
+# Only the permissions that the workspace-manager needs to manage workspace instances and jobs in the release namespace.
+# A namespaced Role is used instead of a ClusterRole, because some clusters don't allow cluster-scoped RBAC objects.
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
- name: "{{ include "modelix.fullname" . }}-sa-edit"
- namespace: "{{ .Release.Namespace }}"
+  name: "{{ include "modelix.fullname" . }}-workspace-manager"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    {{- include "modelix.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["list", "create", "delete"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["list"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["list", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "{{ include "modelix.fullname" . }}-workspace-manager"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    {{- include "modelix.labels" . | nindent 4 }}
 subjects:
 - kind: ServiceAccount
-  name: "{{ include "modelix.fullname" . }}-sa"
+  name: "{{ include "modelix.serviceAccountName" . }}"
   namespace: "{{ .Release.Namespace }}"
 roleRef:
- kind: ClusterRole
- name: edit
- apiGroup: rbac.authorization.k8s.io
-{{ end }}
+  kind: Role
+  name: "{{ include "modelix.fullname" . }}-workspace-manager"
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

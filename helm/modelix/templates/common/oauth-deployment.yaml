@@ -24,7 +24,8 @@ spec:
         {{- include "modelix.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - image: "{{ .Values.dockerProxy.prefix }}redis:7.4.2"
+        - image: "{{ include "modelix.image" (dict "root" . "image" .Values.oauthProxy.redis.image) }}"
+          imagePullPolicy: {{ .Values.oauthProxy.redis.image.pullPolicy }}
           name: redis
           resources:
             requests:
@@ -45,7 +46,7 @@ spec:
             initialDelaySeconds: 3
             periodSeconds: 10
             timeoutSeconds: 5
-        - image: "{{ .Values.dockerProxy.prefix }}{{.Values.oauthProxy.image.repository}}:{{ .Values.oauthProxy.image.tag }}"
+        - image: "{{ include "modelix.image" (dict "root" . "image" .Values.oauthProxy.image) }}"
           imagePullPolicy: {{.Values.oauthProxy.image.pullPolicy}}
           name: oauth2-proxy
           env:

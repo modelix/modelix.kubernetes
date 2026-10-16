@@ -13,6 +13,12 @@ oauthProxy:
     repository: quay.io/oauth2-proxy/oauth2-proxy
     tag: "v7.15.5"
     pullPolicy: IfNotPresent
+  # Session store of oauth2-proxy
+  redis:
+    image:
+      repository: redis
+      tag: "7.4.2"
+      pullPolicy: IfNotPresent
 
 modelServer:
   image:
@@ -128,22 +134,54 @@ postgres:
       pullPolicy: IfNotPresent
 
 dockerProxy:
+  # Prefix for images from Docker Hub, which are the images without a registry host such as `modelix/model-server`,
+  # `postgres` or `docker.io/library/redis`. For example "artifactory.example.com/docker-remote/".
+  # Images of other registries aren't changed by it. Use `registryMirrors` for them.
   prefix: ""
+  # Mirrors for images of other registries than Docker Hub. Maps the registry host to the prefix that replaces it.
+  # For example, with `quay.io: artifactory.example.com/quay-remote`, the image `quay.io/oauth2-proxy/oauth2-proxy`
+  # is pulled from `artifactory.example.com/quay-remote/oauth2-proxy/oauth2-proxy`.
+  registryMirrors: {}
   secret: ""
   secret64: ""
   caCertificate: ""
 
 internalDockerRegistry:
-  # The internal docker registry does not use HTTPS.
-  # Kubernetes only allows pulling images from such insecure repositories when they run on localhost.
-  # Therefore, the internal docker registry is exposed through NodePort on each cluster node.
-  # The node port on which it is exposed needs
-  # to be known in advance because we need to specify the address for authentication.
-  # The node port is configurable to allow
-  # changing it in deployments where it conflicts with other statically assigned node ports.
+  # The internal docker registry stores the images of the workspaces and does not use HTTPS.
+  # The kubelet pulls these images from `pullAddress`. Kubernetes nodes only pull from a plain HTTP registry without
+  # further configuration if it is reachable at localhost. Therefore, by default, the registry is exposed through a
+  # NodePort on each cluster node and pulled from `localhost:<nodePort>`.
+  #
+  # If NodePorts aren't available, the registry can be exposed differently (for example with a LoadBalancer) and
+  # `pullAddress` set accordingly. Any address other than localhost requires the container runtime of all nodes to
+  # be configured to allow it as an insecure (HTTP) registry. For RKE2, for example, that is done in
+  # /etc/rancher/rke2/registries.yaml:
+  #
+  #   mirrors:
+  #     "10.0.0.10:5000":
+  #       endpoint:
+  #         - "http://10.0.0.10:5000"
+  service:
+    # NodePort, LoadBalancer or ClusterIP
+    type: NodePort
+    # Only used if the type is LoadBalancer.
+    loadBalancerIP: ""
+    annotations: {}
+  # The node port on which it is exposed needs to be known in advance because we need to specify the address for
+  # authentication. The node port is configurable to allow changing it in deployments where it conflicts with other
+  # statically assigned node ports. Only used if the service type is NodePort.
   nodePort: 30033
+  # host:port from which the kubelet pulls workspace images. Defaults to `localhost:<nodePort>`.
+  # Required if the service type isn't NodePort. For a LoadBalancer, this is usually `<load balancer IP>:5000`.
+  pullAddress: ""
 
+# Name of an existing service account to use instead of the one created by this chart.
 serviceAccount: ""
+
+rbac:
+  # Creates a namespaced Role and RoleBinding for the service account (see `serviceAccount`) with the permissions the
+  # workspace-manager needs to manage workspace instances. Disable it if the RBAC objects are managed outside this chart.
+  create: true
 
 authorization:
   enabled: true
