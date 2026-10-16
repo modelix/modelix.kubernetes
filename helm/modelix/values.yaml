@@ -143,7 +143,13 @@ internalDockerRegistry:
   # changing it in deployments where it conflicts with other statically assigned node ports.
   nodePort: 30033
 
+# Name of an existing service account to use instead of the one created by this chart.
 serviceAccount: ""
+
+rbac:
+  # Creates a namespaced Role and RoleBinding for the service account (see `serviceAccount`) with the permissions the
+  # workspace-manager needs to manage workspace instances. Disable it if the RBAC objects are managed outside this chart.
+  create: true
 
 authorization:
   enabled: true
