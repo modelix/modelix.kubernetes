@@ -1,16 +1,23 @@
 {{- if not .Values.db.useGCloud }}
+{{- $name := printf "%s-db-data" (include "modelix.fullname" .) }}
+{{- $storage := .Values.db.storage }}
+{{- if not $storage }}
+{{- /* Keep the size of an existing claim. Increasing it fails if the StorageClass doesn't allow volume expansion. */}}
+{{- $existing := lookup "v1" "PersistentVolumeClaim" .Release.Namespace $name | default dict }}
+{{- $storage = dig "spec" "resources" "requests" "storage" "20Gi" $existing }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
     component: db-data
-  name: "{{ include "modelix.fullname" . }}-db-data"
+  name: "{{ $name }}"
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.db.storage }}
+      storage: {{ $storage }}
   {{ if not (empty .Values.storageClassName) }}
   storageClassName: {{ .Values.storageClassName }}
   {{ end }}

@@ -1,0 +1,76 @@
+{{- if .Values.keycloak.realmSync.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "modelix.fullname" . }}-keycloak-realm-sync"
+  labels:
+    component: keycloak-realm-sync
+    {{- include "modelix.labels" . | nindent 4 }}
+data:
+  realm.json: |-
+{{ include "modelix.keycloakRealmSyncConfig" . | indent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # The pod template of a Job is immutable. A new Job for each revision runs the synchronization after each upgrade.
+  # Helm deletes the Job of the previous revision.
+  name: "{{ include "modelix.fullname" . | trunc 40 | trimSuffix "-" }}-realm-sync-{{ .Release.Revision }}"
+  labels:
+    component: keycloak-realm-sync
+    {{- include "modelix.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        component: keycloak-realm-sync
+        {{- include "modelix.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: keycloak-config-cli
+          image: "{{ include "modelix.image" (dict "root" . "image" .Values.keycloak.realmSync.image) }}"
+          imagePullPolicy: {{ .Values.keycloak.realmSync.image.pullPolicy }}
+          args:
+            - --keycloak.url={{ include "modelix.internalKeycloakUrl" . | trimSuffix "/" }}
+            - --keycloak.user=admin
+            # Waits until Keycloak is started. Keycloak imports keycloak-realm.json during startup if the realm doesn't exist.
+            - --keycloak.availability-check.enabled=true
+            - --keycloak.availability-check.timeout=300s
+            - --import.files.locations=/config/realm.json
+            # Resolves $(env:...) placeholders used for the client secrets.
+            - --import.var-substitution.enabled=true
+            # Nothing is deleted. Only the resources of the synchronized realm config are created or updated.
+            - --import.managed.client=no-delete
+            - --import.managed.role=no-delete
+            - --import.managed.identity-provider=no-delete
+            - --import.managed.identity-provider-mapper=no-delete
+          env:
+            - name: KEYCLOAK_PASSWORD
+              value: "{{ .Values.keycloak.adminPassword }}"
+            - name: REALM_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: keycloak-client-secret
+                  name: "{{ include "modelix.fullname" . }}-keycloak-client-secret"
+            {{- range $index, $idp := .Values.keycloak.identityProviders }}
+            {{- if $idp.clientSecret }}
+            - name: {{ include "modelix.keycloakIdentityProviderSecretEnv" $index }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required (printf "keycloak.identityProviders[%d].clientSecret.secretName is required" $index) $idp.clientSecret.secretName | quote }}
+                  key: {{ $idp.clientSecret.secretKey | default "client-secret" | quote }}
+            {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.keycloak.realmSync.resources | nindent 12 }}
+          volumeMounts:
+            - name: realm-config
+              mountPath: /config
+      volumes:
+        - name: realm-config
+          configMap:
+            name: "{{ include "modelix.fullname" . }}-keycloak-realm-sync"
+      {{- include "modelix.pullSecret" . | nindent 6 }}
+{{- end }}
