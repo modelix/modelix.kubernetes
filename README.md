@@ -139,7 +139,16 @@ An MPS instances with a lot of languages and plugins can require ~8 GB of memory
 
 ## Publishing
 
-Commits published to `main` automatically trigger a new release.
+Releases are managed by [release-please](https://github.com/googleapis/release-please).
+For each commit on `main`, it updates a release PR that bumps the version in [Chart.yaml](helm/modelix/Chart.yaml)
+and adds the changes to the [CHANGELOG.md](CHANGELOG.md).
+The version and the changelog are derived from the [Conventional Commits](https://www.conventionalcommits.org/) messages.
+Merging the release PR creates the tag and the GitHub release, which triggers the publishing of the
+OCI images, the Gradle plugin and the Helm chart.
+
+Because the chart version in git is always the version of the latest release,
+a checkout of a release tag can also be installed directly (`helm install modelix ./helm/modelix`),
+and it uses the images of that release.
 
 Update the [versions.properties](versions.properties) to update the versions of:
 * Modelix Model Server

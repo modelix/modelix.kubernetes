@@ -1,31 +1,29 @@
 name: Release
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *' # run at 2 AM UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
 
 jobs:
   release:
-    name: Run semantic release
+    name: Run release-please
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # to be able to publish a GitHub release
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      # Keeps a release PR up to date that bumps the version in helm/modelix/Chart.yaml and updates the CHANGELOG.md.
+      # Merging that PR creates the tag and the GitHub release.
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
-          fetch-depth: 0
+          # Tags and pull requests created with the default GITHUB_TOKEN don't trigger other workflows.
+          # The tag has to trigger publish.yml and the release PR needs its CI checks.
           token: ${{ secrets.RELEASE_TOKEN }}
-
-      - name: Setup Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-        with:
-          node-version: "lts/*"
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm clean-install
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
