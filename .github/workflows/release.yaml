@@ -17,13 +17,32 @@ jobs:
     name: Run release-please
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       # Keeps a release PR up to date that bumps the version in helm/modelix/Chart.yaml and updates the CHANGELOG.md.
       # Merging that PR creates the tag and the GitHub release.
+      #
+      # The default GITHUB_TOKEN doesn't trigger other workflows. Therefore, the tag doesn't trigger publish.yml
+      # and the publishing is started by the next job.
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
         with:
-          # Tags and pull requests created with the default GITHUB_TOKEN don't trigger other workflows.
-          # The tag has to trigger publish.yml and the release PR needs its CI checks.
-          token: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  publish:
+    name: Publish
+    needs: release
+    if: ${{ needs.release.outputs.release_created == 'true' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ needs.release.outputs.tag_name }}
+    secrets: inherit
