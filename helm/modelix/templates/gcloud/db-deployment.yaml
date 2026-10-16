@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: cloudsql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        image: "{{ include "modelix.image" (dict "root" . "image" (dict "repository" "gcr.io/cloudsql-docker/gce-proxy" "tag" "1.11")) }}"
         command: ["/cloud_sql_proxy",
                   "-instances=webmps:europe-west3:modelix=tcp:0.0.0.0:5432",
                   "-credential_file=/secrets/cloudsql/cloudsql.json"]

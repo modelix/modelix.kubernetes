@@ -28,7 +28,7 @@ spec:
       {{- if .Values.postgres.autoupgrade.enabled }}
       initContainers:
       - name: db-upgrade
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.autoupgrade.image.repository }}:{{ .Values.postgres.autoupgrade.image.tag }}"
+        image: "{{ include "modelix.image" (dict "root" . "image" .Values.postgres.autoupgrade.image) }}"
         imagePullPolicy: {{ .Values.postgres.autoupgrade.image.pullPolicy }}
         command: ["bash", "-ec"]
         args:
@@ -63,7 +63,7 @@ spec:
       containers:
       - env:
         {{- include "modelix.db.env" . | nindent 8 }}
-        image: "{{ .Values.dockerProxy.prefix }}{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
+        image: "{{ include "modelix.image" (dict "root" . "image" .Values.postgres.image) }}"
         imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
         name: db
         resources:

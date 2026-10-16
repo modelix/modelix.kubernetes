@@ -35,7 +35,7 @@ data:
               effect: "NoExecute"
           containers:
           - name: workspace-client
-            image: "{{ .Values.dockerProxy.prefix }}modelix/mps-vnc-baseimage:{{ .Values.versions.modelix.vncBaseImage }}-mps2024.1"
+            image: "{{ include "modelix.image" (dict "root" . "image" (dict "repository" "modelix/mps-vnc-baseimage" "tag" (printf "%s-mps2024.1" .Values.versions.modelix.vncBaseImage))) }}"
             imagePullPolicy: Always
             env:
             - name: "modelix_executionMode"

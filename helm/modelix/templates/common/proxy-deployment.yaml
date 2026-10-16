@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: proxy
-        image: "{{ .Values.dockerProxy.prefix }}{{.Values.proxy.image.repository}}:{{ .Values.proxy.image.tag | default .Chart.Version }}"
+        image: "{{ include "modelix.image" (dict "root" . "image" .Values.proxy.image "defaultTag" .Chart.Version) }}"
         imagePullPolicy: {{.Values.proxy.image.pullPolicy}}
         env:
           - name: KUBERNETES_NAMESPACE
