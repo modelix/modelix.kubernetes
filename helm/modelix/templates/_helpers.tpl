@@ -109,3 +109,18 @@ PGDATA is set explicitly to keep using the existing data directory of deployment
   value: "{{ .Values.httpProxy }}"
 {{- end }}
 {{- end }}
+
+
+{{/*
+Address (host:port) from which the kubelet pulls images from the internal docker registry.
+*/}}
+{{- define "modelix.internalDockerRegistry.pullAddress" -}}
+{{- $registry := .Values.internalDockerRegistry }}
+{{- if $registry.pullAddress }}
+{{- $registry.pullAddress }}
+{{- else if eq $registry.service.type "NodePort" }}
+{{- printf "localhost:%d" (int $registry.nodePort) }}
+{{- else }}
+{{- fail (printf "internalDockerRegistry.pullAddress is required if internalDockerRegistry.service.type is %s" $registry.service.type) }}
+{{- end }}
+{{- end }}

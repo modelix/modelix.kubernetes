@@ -62,7 +62,7 @@ spec:
           - name: WORKSPACE_DOCKER_REGISTRY
             value: localhost:5000
           - name: INTERNAL_DOCKER_REGISTRY_AUTHORITY
-            value: "localhost:{{ .Values.internalDockerRegistry.nodePort }}"
+            value: "{{ include "modelix.internalDockerRegistry.pullAddress" . }}"
           - name: INTERNAL_DOCKER_REGISTRY_USER
             valueFrom:
               secretKeyRef:

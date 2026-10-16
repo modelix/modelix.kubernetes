@@ -5,13 +5,23 @@ metadata:
     component: docker-registry
     {{- include "modelix.labels" . | nindent 4 }}
   name: "{{ include "modelix.fullname" . }}-docker-registry"
+  {{- with .Values.internalDockerRegistry.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  type: NodePort
+  {{- $type := .Values.internalDockerRegistry.service.type }}
+  type: {{ $type }}
+  {{- if and (eq $type "LoadBalancer") .Values.internalDockerRegistry.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.internalDockerRegistry.service.loadBalancerIP | quote }}
+  {{- end }}
   ports:
   - name: "5000"
     port: 5000
     targetPort: 5000
+    {{- if eq $type "NodePort" }}
     nodePort: {{ .Values.internalDockerRegistry.nodePort }}
+    {{- end }}
   selector:
     component: docker-registry
     {{- include "modelix.selectorLabels" . | nindent 4 }}
