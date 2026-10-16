@@ -9,7 +9,10 @@
       "package-name": "modelix.kubernetes",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
-        "helm/modelix/Chart.yaml"
+        {
+          "type": "generic",
+          "path": "helm/modelix/Chart.yaml"
+        }
       ]
     }
   }
