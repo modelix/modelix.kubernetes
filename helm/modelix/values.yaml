@@ -23,13 +23,13 @@ oauthProxy:
 modelServer:
   image:
     repository: modelix/model-server
-    tag: "20.0.0"
+    tag: "20.1.0"
     pullPolicy: IfNotPresent
 
 gitImport:
   image:
     repository: modelix/mps-git-import
-    tag: "20.0.0"
+    tag: "20.1.0"
     pullPolicy: IfNotPresent
 
 proxy:
