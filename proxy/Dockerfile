@@ -1,7 +1,7 @@
 # Build context is the repository root (see proxy/Dockerfile.dockerignore).
 # The build stages produce static files only, so they run on the build platform instead of being emulated.
 
-FROM --platform=$BUILDPLATFORM node:24.22.0-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS openapi
+FROM --platform=$BUILDPLATFORM node:24.22.2-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85 AS openapi
 WORKDIR /project/openapi/redocly
 COPY openapi/redocly/package.json openapi/redocly/package-lock.json ./
 RUN npm ci
@@ -9,7 +9,7 @@ COPY openapi/specifications/ /project/openapi/specifications/
 COPY openapi/redocly/ ./
 RUN npm run bundle
 
-FROM --platform=$BUILDPLATFORM node:24.22.0-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS dashboard
+FROM --platform=$BUILDPLATFORM node:24.22.2-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85 AS dashboard
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 WORKDIR /project/dashboard
