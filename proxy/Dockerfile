@@ -25,7 +25,7 @@ RUN pnpm run generate-openapi-workspaces \
 COPY dashboard/ ./
 RUN pnpm run build
 
-FROM caddy:2.11@sha256:685ae3d7c34d9b5f8caeddc5d14051db7bbd88ff1f5a2fa0c16bd8ca328fb7af
+FROM caddy:2.11@sha256:4851e54a46b206517c574821bb5cc67f170d2156041e9fbc4c9193b45e84a75b
 COPY proxy/Caddyfile /etc/caddy/Caddyfile
 COPY proxy/index.html /usr/share/caddy/
 COPY proxy/public/ /usr/share/caddy/public/
